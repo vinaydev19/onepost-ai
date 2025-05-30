@@ -509,7 +509,7 @@ export {
     refreshAccessToken,
     loginWithGoogle,
     changeCurrentPassword,
-    ChangeEmailVerification,
     emailChangeConfirmation,
-    getCurrentUser
+    getCurrentUser,
+    emailChangeVerification
 }
