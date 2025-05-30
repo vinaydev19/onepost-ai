@@ -12,7 +12,7 @@ import {
 const sendVerificationCode = async (email, verificationCode) => {
     try {
         const res = await mailTransporter.sendMail({
-            from: "WriterFlow <vinaydev19.projects@gmail.com>",
+            from: "onePost AI <vinaydev19.projects@gmail.com>",
             to: email,
             subject: "Verify Your Email",
             text: "verify Your Email",
@@ -26,13 +26,13 @@ const sendVerificationCode = async (email, verificationCode) => {
     }
 }
 
-const sendWalcomeEmail = async (name, email) => {
+const sendWelcomeEmail = async (name, email) => {
     try {
         const res = await mailTransporter.sendMail({
-            from: "WriterFlow <vinaydev19.projects@gmail.com>",
+            from: "onePost AI <vinaydev19.projects@gmail.com>",
             to: email,
-            subject: "Walcome to our WriterFlow community",
-            text: "Walcome to our WriterFlow community",
+            subject: "Walcome to our onePost AI community",
+            text: "Walcome to our onePost AI community",
             html: Welcome_Email_Template.replace("{name}", name)
         })
         console.log("walcome email is send successfully", res);
@@ -43,7 +43,45 @@ const sendWalcomeEmail = async (name, email) => {
     }
 }
 
+const resetPasswordTokenSent = async (email, link) => {
+    try {
+        const res = await mailTransporter.sendMail({
+            from: "onePost AI <vinaydev19.projects@gmail.com>",
+            to: email,
+            subject: "reset password link",
+            text: "reset password link",
+            html: Reset_Password_Email_Template.replace("{link}", link)
+        })
+        console.log("reset pasword link is send successfully", res);
+    } catch (error) {
+        console.log(
+            `something want wrong while send the reset pasword || ${error}`
+        );
+    }
+}
+
+
+const resetPasswordConfirmationEmail = async (name, email) => {
+    try {
+        const res = await mailTransporter.sendMail({
+            from: "onePost AI <vinaydev19.projects@gmail.com>",
+            to: email,
+            subject: "Reset pasword confirmation our onePost AI community",
+            text: "Reset pasword confirmation our onePost AI community",
+            html: Password_Reset_Confirmation_Email.replace("{name}", name)
+        })
+        console.log("reset pasword confirmation is send successfully", res);
+    } catch (error) {
+        console.log(
+            `something want wrong while send the reset pasword confirmation || ${error}`
+        );
+    }
+}
+
+
 export {
     sendVerificationCode,
-    sendWalcomeEmail
+    sendWelcomeEmail,
+    resetPasswordTokenSent,
+    resetPasswordConfirmationEmail
 }

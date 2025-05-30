@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: false,
     },
     refreshToken: {
         type: String,
@@ -35,10 +35,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    verficationToken: {
+    verificationToken: {
         type: String,
     },
-    verficationTokenExpiresAt: {
+    verificationTokenExpiresAt: {
         type: Date,
     },
     resetPasswordToken: {

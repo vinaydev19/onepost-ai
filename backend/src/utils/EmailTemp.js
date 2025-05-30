@@ -4,7 +4,7 @@ export const Verification_Email_Template = `
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WriterFlow - Verify Your Email</title>
+  <title>onePost AI - Verify Your Email</title>
   <style>
     body {
       background-color: #f1f3f9;
@@ -79,18 +79,18 @@ export const Verification_Email_Template = `
 <body>
   <div class="email-container">
     <div class="email-header">
-      Verify Your Email - WriterFlow
+      Verify Your Email - onePost AI
     </div>
     <div class="email-body">
       <p>Hello,</p>
-      <p>Thank you for joining <strong>WriterFlow</strong>! To complete your registration, please use the verification code below:</p>
+      <p>Thank you for joining <strong>onePost AI</strong>! To complete your registration, please use the verification code below:</p>
 
       <div class="verification-code">{verificationCode}</div>
 
-      <p>If you didn’t create a WriterFlow account, you can safely ignore this message. For any help, feel free to contact our support team.</p>
+      <p>If you didn’t create a onePost AI account, you can safely ignore this message. For any help, feel free to contact our support team.</p>
     </div>
     <div class="email-footer">
-      &copy; ${new Date().getFullYear()} WriterFlow. All rights reserved.
+      &copy; ${new Date().getFullYear()} onePost AI. All rights reserved.
     </div>
   </div>
 </body>
@@ -104,7 +104,7 @@ export const Welcome_Email_Template = `
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome to WriterFlow</title>
+  <title>Welcome to onePost AI</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -179,11 +179,11 @@ export const Welcome_Email_Template = `
 <body>
   <div class="container">
     <div class="header">
-      <h1>Welcome to WriterFlow!</h1>
+      <h1>Welcome to onePost AI!</h1>
     </div>
     <div class="content">
       <p class="welcome-message">Hi {name},</p>
-      <p>We're thrilled to welcome you to <strong>WriterFlow</strong> – your powerful writing and publishing companion for modern creators and businesses.</p>
+      <p>We're thrilled to welcome you to <strong>onePost AI</strong> – your powerful writing and publishing companion for modern creators and businesses.</p>
       <p>Here’s what you can start doing right away:</p>
       <ul>
         <li>Create AI-assisted drafts and content effortlessly.</li>
@@ -193,7 +193,7 @@ export const Welcome_Email_Template = `
       <p>If you need any assistance, just reply to this email or contact our support team.</p>
     </div>
     <div class="footer">
-      &copy; ${new Date().getFullYear()} WriterFlow. All rights reserved.
+      &copy; ${new Date().getFullYear()} onePost AI. All rights reserved.
     </div>
   </div>
 </body>
@@ -207,7 +207,7 @@ export const Reset_Password_Email_Template = `
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>WriterFlow - Verify Your Email</title>
+      <title>onePost AI - Verify Your Email</title>
       <style>
           body {
               font-family: Arial, sans-serif;
@@ -265,16 +265,16 @@ export const Reset_Password_Email_Template = `
   </head>
   <body>
       <div class="container">
-          <div class="header">WriterFlow - Verify Your Email</div>
+          <div class="header">onePost AI - Verify Your Email</div>
           <div class="content">
               <p>Hello,</p>
-              <p>We received a request to reset your password for <strong>WriterFlow</strong>. by entering the code below:</p>
-              <span class="verification-code">{verificationCode}</span>
+              <p>We received a request to reset your password for <strong>onePost AI</strong>. by entering the code below:</p>
+            <a href="{link}">d</a>
               <p>If you didn’t request a password reset, you can safely ignore this email.</p>
               <p>For further assistance, feel free to contact our support team.</p>
           </div>
           <div class="footer">
-              <p>&copy; ${new Date().getFullYear()} WriterFlow. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} onePost AI. All rights reserved.</p>
           </div>
       </div>
   </body>
@@ -287,7 +287,7 @@ export const Password_Reset_Confirmation_Email = `
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>WriterFlow - Password Reset Successful</title>
+      <title>onePost AI - Password Reset Successful</title>
       <style>
           body {
               font-family: Arial, sans-serif;
@@ -332,16 +332,16 @@ export const Password_Reset_Confirmation_Email = `
   </head>
   <body>
       <div class="container">
-          <div class="header">WriterFlow - Password Reset Successful</div>
+          <div class="header">onePost AI - Password Reset Successful</div>
           <div class="content">
               <p>Hello {name},</p>
               <p>Your password has been successfully reset. You can now log in using your new password.</p>
               <p>If you did not request this change, please contact our support team immediately.</p>
               <p>Stay secure,</p>
-              <p><strong>WriterFlow Team</strong></p>
+              <p><strong>onePost AI Team</strong></p>
           </div>
           <div class="footer">
-              <p>&copy; ${new Date().getFullYear()} WriterFlow. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} onePost AI. All rights reserved.</p>
           </div>
       </div>
   </body>
@@ -354,7 +354,7 @@ export const Email_Change_Verification_Template = `
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>WriterFlow - Verify Your New Email</title>
+      <title>onePost AI - Verify Your New Email</title>
       <style>
           body {
               font-family: Arial, sans-serif;
@@ -412,15 +412,15 @@ export const Email_Change_Verification_Template = `
   </head>
   <body>
       <div class="container">
-          <div class="header">WriterFlow - Verify Your New Email</div>
+          <div class="header">onePost AI - Verify Your New Email</div>
           <div class="content">
               <p>Hello,</p>
-              <p>You have requested to change your email address for your <strong>WriterFlow</strong> account. To proceed, please verify your new email address by entering the code below:</p>
+              <p>You have requested to change your email address for your <strong>onePost AI</strong> account. To proceed, please verify your new email address by entering the code below:</p>
               <span class="verification-code">{verificationCode}</span>
               <p>If you did not request this change, please ignore this email or contact our support team immediately.</p>
           </div>
           <div class="footer">
-              <p>&copy; ${new Date().getFullYear()} WriterFlow. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} onePost AI. All rights reserved.</p>
           </div>
       </div>
   </body>
@@ -433,7 +433,7 @@ export const Email_Change_Confirmation_Email = `
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>WriterFlow - Email Change Successful</title>
+      <title>onePost AI - Email Change Successful</title>
       <style>
           body {
               font-family: Arial, sans-serif;
@@ -478,16 +478,16 @@ export const Email_Change_Confirmation_Email = `
   </head>
   <body>
       <div class="container">
-          <div class="header">WriterFlow - Email Change Successful</div>
+          <div class="header">onePost AI - Email Change Successful</div>
           <div class="content">
               <p>Hello {name},</p>
               <p>Your email address has been successfully updated. From now on, please use your new email address to log in to your account.</p>
               <p>If you did not request this change, please contact our support team immediately.</p>
               <p>Stay secure,</p>
-              <p><strong>WriterFlow Team</strong></p>
+              <p><strong>onePost AI Team</strong></p>
           </div>
           <div class="footer">
-              <p>&copy; ${new Date().getFullYear()} WriterFlow. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} onePost AI. All rights reserved.</p>
           </div>
       </div>
   </body>
