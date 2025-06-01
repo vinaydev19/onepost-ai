@@ -495,6 +495,75 @@ const emailChangeConfirmation = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "your email has been changed successfully"));
 });
 
+const getBloggerProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params
+
+    if (!username) {
+        throw new ApiError(400, "username is required")
+    }
+
+
+    const follow = await User.aggregate([
+        {
+            $match: {
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "followers",
+                as: "followers"
+            }
+        },
+        {
+            $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "following",
+                as: "following"
+            }
+        },
+        {
+            $addFields: {
+                followersCount: {
+                    $size: "$followers"
+                },
+                followingCount: {
+                    $size: "$following"
+                },
+                isFollowingCount: {
+                    $cond: {
+                        if: {
+                            $in: [req.user?._id, "$followers.followers"]
+                        },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                fullName: 1,
+                username: 1,
+                followersCount: 1,
+                followingCount: 1,
+                isFollowingCount: 1,
+                profilePic: 1
+            }
+        }
+    ])
+
+    if (!follow?.length) {
+        throw new ApiError(400, "follow does not exist")
+    }
+
+    return res.status(200).json(new ApiResponse(200, follow[0], "user follow fetched succesfully"))
+
+
+})
 
 export {
     userRegister,
@@ -511,5 +580,6 @@ export {
     changeCurrentPassword,
     emailChangeConfirmation,
     getCurrentUser,
-    emailChangeVerification
+    emailChangeVerification,
+    getBloggerProfile
 }
