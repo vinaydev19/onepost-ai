@@ -17,11 +17,20 @@ app.use(express.json())
 app.use(express.static("public"))
 
 
-// import router
+// import routes
 import userRouter from "./routes/user.routes.js"
+import blogRouter from "./routes/blog.routes.js"
+import commentRouter from "./routes/comment.routes.js"
+import likeRouter from "./routes/like.routes.js"
+
+
 
 // use router
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/blogs", blogRouter);
+app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/likes", likeRouter);
+
 
 // error handler
 app.use(errorHandler)

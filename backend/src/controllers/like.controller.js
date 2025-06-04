@@ -102,6 +102,6 @@ export {
     toggleCommentLike,
     toggleBlogLike,
     getBlogLikes,
-    getBlogLikes
+    getCommentLikes
 }
 
