@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
     },
-    fullName:{
+    fullName: {
         type: String,
         required: true,
     },
@@ -47,9 +47,10 @@ const userSchema = new mongoose.Schema({
     resetPasswordTokenExpiresAt: {
         type: Date,
     },
-    expiresAt: {
+    verificationTimeout: {
         type: Date,
-        default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
+        default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        index: { expires: 0 },
     }
 }, { timestamps: true })
 
