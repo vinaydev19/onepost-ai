@@ -1,3 +1,7 @@
+import dotenv from "dotenv"
+dotenv.config({
+    path: '.env'
+})
 import nodemailer from "nodemailer"
 
 const mailTransporter = nodemailer.createTransport({

@@ -49,11 +49,9 @@ const userSchema = new mongoose.Schema({
     },
     verificationTimeout: {
         type: Date,
-        default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         index: { expires: 0 },
     }
 }, { timestamps: true })
-
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();

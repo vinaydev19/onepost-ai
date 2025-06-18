@@ -54,7 +54,8 @@ const userRegister = asyncHandler(async (req, res) => {
         fullName,
         password,
         verificationToken,
-        verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000
+        verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
+        verificationTimeout: Date.now() + 24 * 60 * 60 * 1000
     })
 
     const loggedUser = await User.findById(user._id)
@@ -65,7 +66,7 @@ const userRegister = asyncHandler(async (req, res) => {
 
     await sendVerificationCode(email, verificationToken)
 
-    return res.status(200).json(new ApiResponse(500, { loggedUser }, "account has been created successfully"))
+    return res.status(200).json(new ApiResponse(200, { loggedUser }, "account has been created successfully"))
 })
 
 const verifyUser = asyncHandler(async (req, res) => {
@@ -89,7 +90,8 @@ const verifyUser = asyncHandler(async (req, res) => {
             },
             $unset: {
                 verificationToken: 1,
-                verificationTokenExpiresAt: 1
+                verificationTokenExpiresAt: 1,
+                verificationTimeout: 1
             }
         },
         {
