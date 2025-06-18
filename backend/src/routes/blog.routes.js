@@ -1,38 +1,43 @@
 import { Router } from 'express';
-import { getAllBlogs, getBlogById, createBlog, updateBlog, deleteBlog } from '../controllers/blog.controller.js';
+import {
+    createBlog,
+    getAllBlog,
+    getOneBlog,
+    getAllBlogByAuthor,
+    updateBlog,
+    deleteBlog,
+    getMyBlogs,
+    updateBlogStatus
+} from "../controllers/blog.controller.js";
 import { verifyJWT } from '../middlewares/auth.middleware.js';
-import { upload } from '../middlewares/upload.middleware.js';
+import { upload } from '../middlewares/multer.middleware.js';
 
 const router = Router();
 
-// Route to get all blogs
-router.get('/get-blogs', getAllBlogs);
-// Route to get a blog by ID
-router.get('get-blog/:id', getBlogById);
-// Route to create a new blog
+// Create a new blog
 router.post('/create-blog', verifyJWT, upload.fields([
-    {
-        name: "featuredImage"  // Assuming you want to upload an image for the blog
-    },
-    {
-        name: "files",
-        maxCount: 10
-    }
+    { name: "featuredImage" },
+    { name: "files", maxCount: 10 }
 ]), createBlog);
-// Route to update a blog by ID
+
+// Get all blogs
+router.get('/get-blogs', getAllBlog);
+
+// Get a single blog by ID
+router.get('/get-blog/:id', getOneBlog);
+
+// Update a blog by ID
 router.put('/update-blog/:id', verifyJWT, upload.fields([
-    {
-        name: "featuredImage"  // Assuming you want to upload an image for the blog
-    },
-    {
-        name: "files",
-        maxCount: 10
-    }
+    { name: "featuredImage" },
+    { name: "files", maxCount: 10 }
 ]), updateBlog);
-// Route to delete a blog by ID
+
+// Delete a blog by ID
 router.delete('/delete-blog/:id', verifyJWT, deleteBlog);
 
+// Optionally use these if needed
+router.get('/author-blogs/:authorId', getAllBlogByAuthor);
+router.get('/my-blogs', verifyJWT, getMyBlogs);
+router.patch('/update-blog-status/:id', verifyJWT, updateBlogStatus);
 
-
-// Export the router
 export default router;

@@ -1,8 +1,8 @@
-import { ApiError } from "./ApiError";
+import { ApiError } from "./ApiError.js";
 
 
 
-const asyncHandler = (fn) = async (req, res, next) => {
+const asyncHandler = (fn) => async (req, res, next) => {
     try {
         await fn(req, res, next)
     } catch (error) {

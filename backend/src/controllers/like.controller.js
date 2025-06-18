@@ -1,9 +1,9 @@
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
-import { Like } from "../models/like.model";
-import { Blog } from "../models/blog.model";
-import { Comment } from "../models/comment.model";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { Like } from "../models/like.model.js";
+import { Blog } from "../models/blog.model.js";
+import { Comment } from "../models/comment.model.js";
 
 
 const toggleBlogLike = asyncHandler(async (req, res) => {

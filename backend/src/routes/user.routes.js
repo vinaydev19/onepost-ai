@@ -15,10 +15,10 @@ import {
     emailChangeConfirmation,
     getCurrentUser,
     emailChangeVerification
-} from "../controllers/user.controller";
+} from "../controllers/user.controller.js";
 
-import { verifyJWT } from "../middlewares/auth.middelware";
-import { upload } from "../middlewares/multer.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 

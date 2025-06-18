@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware";
-import {createComment, deleteComment, getAllComments, updateComment} from "../controllers/comment.controller";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { addComment, deleteComment, getAllComments, updateComment } from "../controllers/comment.controller.js";
 
 
 const router = Router();
@@ -8,7 +8,7 @@ const router = Router();
 // Route to get all comments for a blog
 router.get("/get-comments/:blogId", getAllComments);
 // Route to create a new comment
-router.post("/create-comment/:blogId", verifyJWT, createComment);
+router.post("/create-comment/:blogId", verifyJWT, addComment);
 // Route to update a comment by ID
 router.put("/update-comment/:commentId", verifyJWT, updateComment);
 // Route to delete a comment by ID
