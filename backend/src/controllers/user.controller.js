@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken"
 import { resetPasswordConfirmationEmail, resetPasswordTokenSent, sendVerificationCode, sendWelcomeEmail } from "../utils/EmailSender.js"
 import { oauth2Client } from "../utils/googleConfig.js"
 import axios from "axios"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 const options = {
     httpOnly: true,
@@ -155,7 +156,7 @@ const userLogin = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(findUser._id)
 
-    const loggedUser = await User.findById(findUser._id)
+    const loggedUser = await User.findById(findUser._id).select("-password -refreshToken");
 
     return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json(new ApiResponse(200, { loggedUser }, "login successfully"))
 })
@@ -311,10 +312,12 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 })
 
 const updateUserProfilePic = asyncHandler(async (req, res) => {
-    const profilePicLocalPath = req.files?.path;
+    const profilePicLocalPath = req.file?.path;
+    console.log("profilePicLocalPath", req.file);
+    
 
     if (!profilePicLocalPath) {
-        throw new ApiResponse(400, "avatar file missing");
+        throw new ApiResponse(400, "profilePic file missing");
     }
 
     const profilePic = await uploadOnCloudinary(profilePicLocalPath);
@@ -323,7 +326,7 @@ const updateUserProfilePic = asyncHandler(async (req, res) => {
         throw new ApiResponse(400, "Error while uploading avatar file");
     }
 
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
