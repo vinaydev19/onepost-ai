@@ -24,7 +24,7 @@ router.post('/create-blog', verifyJWT, upload.fields([
 router.get('/get-blogs', getAllBlog);
 
 // Get a single blog by ID
-router.get('/get-blog/:id', getOneBlog);
+router.get('/get-blog/:slug', getOneBlog);
 
 // Update a blog by ID
 router.put('/update-blog/:id', verifyJWT, upload.fields([
@@ -36,7 +36,7 @@ router.put('/update-blog/:id', verifyJWT, upload.fields([
 router.delete('/delete-blog/:id', verifyJWT, deleteBlog);
 
 // Optionally use these if needed
-router.get('/author-blogs/:authorId', getAllBlogByAuthor);
+router.get('/author-blogs/:username', getAllBlogByAuthor);
 router.get('/my-blogs', verifyJWT, getMyBlogs);
 router.patch('/update-blog-status/:id', verifyJWT, updateBlogStatus);
 

@@ -79,7 +79,7 @@ const getBlogLikes = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Blog not found");
     }
 
-    const likes = await Like.find({ Blog: blog._id }).populate("likedBy", "name email");
+    const likes = await Like.find({ Blog: blog._id }).populate("likedBy", "username email");
 
     return res.status(200).json(new ApiResponse(200, { count: likes.length, likes }, "Blog likes fetched"));
 });
@@ -92,7 +92,7 @@ const getCommentLikes = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Comment not found");
     }
 
-    const likes = await Like.find({ comment: commentId }).populate("likedBy", "name email");
+    const likes = await Like.find({ comment: commentId }).populate("likedBy", "username email");
 
     return res.status(200).json(new ApiResponse(200, { count: likes.length, likes }, "Comment likes fetched"));
 });

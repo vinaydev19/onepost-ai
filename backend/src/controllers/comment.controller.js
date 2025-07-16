@@ -7,10 +7,14 @@ import { Comment } from "../models/comment.model.js"
 
 const addComment = asyncHandler(async (req, res) => {
     const { slug } = req.params;
-    const { content } = req.body;
+    const { content } = req.body;    
 
     if (!slug) {
         throw new ApiError(404, "Blog not found");
+    }
+
+    if (!content) {
+        throw new ApiError(400, "Content cannot be empty");
     }
 
     const blogId = await Blog.findOne({ slug })
@@ -19,16 +23,15 @@ const addComment = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Blog not found");
     }
 
-
-    if (!comment) {
-        throw new ApiError(400, "Comment cannot be empty");
-    }
-
     const comment = await Comment.create({
         content,
         Blog: blogId,
         commentedBy: req.user._id
     })
+
+    if (!comment) {
+        throw new ApiError(500, "Failed to add comment");
+    }
 
     return res.status(201).json(new ApiResponse(200, { comment }, "content added successfully"));
 })
@@ -48,7 +51,7 @@ const getAllComments = asyncHandler(async (req, res) => {
 
 
     const comments = await Comment.find({ Blog: blogId })
-        .populate("commentedBy", "name email")
+        .populate("commentedBy", "username email")
 
     if (!comments || comments.length === 0) {
         throw new ApiError(404, "No comments found for this blog");
@@ -72,15 +75,14 @@ const deleteComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params;
-
     const { content } = req.body;
 
     if (!content) {
         throw new ApiError(400, "Content cannot be empty");
     }
 
-    const comment = await Comment.findOneAndUpdate(
-        { _id: commentId },
+    const comment = await Comment.findByIdAndUpdate(
+        commentId,
         { content },
         { new: true }
     );

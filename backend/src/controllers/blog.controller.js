@@ -6,14 +6,21 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { User } from "../models/user.model.js"
 
 const createBlog = asyncHandler(async (req, res) => {
-    const { title, slug, content, status } = req.body
+    const { title, content, status } = req.body
 
-    if ([title, slug, content, status].some((field) => !field || field.trim() == "")) {
+    console.log([title, content, status]);
+
+
+    if ([title, content, status].some((field) => !field || field.trim() === "")) {
         throw new ApiError(400, "all field are required")
     }
 
     const featuredImageLocalPath = req.files?.featuredImage[0].path
     const featuredImage = await uploadOnCloudinary(featuredImageLocalPath)
+
+    if (!featuredImage?.url) {
+        throw new ApiError(500, "something went wrong while uploading featured image")
+    }
 
     let otherFilesLocalPath = [];
     if (Array.isArray(req.files?.files) && req.files.files.length > 0) {
@@ -21,17 +28,25 @@ const createBlog = asyncHandler(async (req, res) => {
     }
 
     const otherFiles = [];
-    for (const path of otherFilesLocalPath) {
-        const uploadResult = await uploadOnCloudinary(path);
-        if (uploadResult?.url) {
-            otherFiles.push(uploadResult.url);
+    for (let i = 0; i < otherFilesLocalPath.length; i++) {
+        const filePath = otherFilesLocalPath[i];
+        try {
+            const uploadResult = await uploadOnCloudinary(filePath);
+
+            if (uploadResult?.url) {
+                otherFiles.push(uploadResult.url);
+            } else {
+                throw new Error("No URL returned from Cloudinary");
+            }
+        } catch (error) {
+            console.error(`❌ Failed to upload file at index ${i}:`, error.message);
+            throw new ApiError(500, `Failed to upload file at index ${i}`);
         }
     }
 
     const blog = await Blog.create({
         author: req.user._id,
         title,
-        slug,
         content,
         status,
         featuredImage: featuredImage.url,
@@ -56,6 +71,10 @@ const getAllBlog = asyncHandler(async (req, res) => {
 const getOneBlog = asyncHandler(async (req, res) => {
     const slug = req.params.slug
 
+    if (!slug) {
+        throw new ApiError(400, "slug is required")
+    }
+
     const oneBlog = await Blog.findOne({ slug })
 
     if (!oneBlog) {
@@ -70,7 +89,7 @@ const getOneBlog = asyncHandler(async (req, res) => {
 const getAllBlogByAuthor = asyncHandler(async (req, res) => {
     const username = req.params.username
 
-    const BlogsByAuthor = await User.find({ username })
+    const BlogsByAuthor = await User.findOne({ username })
 
     if (!BlogsByAuthor) {
         throw new ApiError(404, "User not found");
@@ -84,9 +103,9 @@ const getAllBlogByAuthor = asyncHandler(async (req, res) => {
 });
 
 const updateBlog = asyncHandler(async (req, res) => {
-    const slug = req.params.slug;
+    const id = req.params.id;
 
-    const existingBlog = await Blog.findOne({ slug });
+    const existingBlog = await Blog.findById(id);
     if (!existingBlog) {
         throw new ApiError(404, "Blog not found");
     }
@@ -97,6 +116,8 @@ const updateBlog = asyncHandler(async (req, res) => {
     if (title) updates.title = title;
     if (content) updates.content = content;
     if (status) updates.status = status;
+
+    // TODO:
 
     const featuredImageLocalPath = req.files?.featuredImage?.[0]?.path
 
@@ -123,8 +144,8 @@ const updateBlog = asyncHandler(async (req, res) => {
         updates.$push = { files: { $each: newFileUrls } };
     }
 
-    const updatedBlog = await Blog.findOneAndUpdate(
-        { slug },
+    const updatedBlog = await Blog.findByIdAndUpdate(
+        id,
         updates,
         { new: true }
     );
@@ -135,10 +156,12 @@ const updateBlog = asyncHandler(async (req, res) => {
 });
 
 const deleteBlog = asyncHandler(async (req, res) => {
-    const slug = req.params.slug;
+    const id = req.params.id;
 
-    const blog = await Blog.findOneAndDelete({ slug });
-
+    if (!id) {
+        throw new ApiError(400, "Blog ID is required");
+    }
+    const blog = await Blog.findByIdAndDelete(id);
     if (!blog) {
         throw new ApiError(404, "Blog not found");
     }
@@ -155,15 +178,15 @@ const getMyBlogs = asyncHandler(async (req, res) => {
 });
 
 const updateBlogStatus = asyncHandler(async (req, res) => {
-    const { slug } = req.params;
+    const id = req.params.id;
     const { status } = req.body;
 
-    if (!["Draft", "Published", "Pending Approval"].includes(status)) {
-        throw new ApiError(400, "Invalid blog status");
+    if (["Draft", "Published", "Pending Approval"].some((s) => s === status) === false) {
+        throw new ApiError(400, "Invalid status. Allowed values are: Draft, Published, Pending Approval");
     }
 
-    const blog = await Blog.findOneAndUpdate(
-        { slug },
+    const blog = await Blog.findByIdAndUpdate(
+        id,
         { status },
         { new: true }
     );
