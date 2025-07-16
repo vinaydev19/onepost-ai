@@ -61,11 +61,35 @@ const createBlog = asyncHandler(async (req, res) => {
 })
 
 const getAllBlog = asyncHandler(async (req, res) => {
-    const allBlogs = await Blog.find({})
+    const { page = 1, limit = 10, sortBy = "createdAt", sortType = "desc" } = req.query
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { allBlogs }, "All blogs fetched successfully"))
+    const skip = (page - 1) * limit;
+
+    const sortOptions = {};
+    if (sortBy) {
+        sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
+    } else {
+        sortOptions.createdAt = -1;
+    }
+
+    const allBlogs = await Blog.find({})
+        .sort(sortOptions)
+        .limit(Number(limit))
+        .skip(skip)
+        .populate("author", "username email");
+
+
+    const totalBlogs = await Blog.countDocuments({});
+
+    const totalPages = Math.ceil(totalBlogs / limit);
+
+    return res.status(200).json(new ApiResponse(200, {
+        blogs: allBlogs,
+        totalBlogs,
+        totalPages,
+        currentPage: Number(page),
+        limit: Number(limit)
+    }, "all blogs fetched successfully"))
 })
 
 const getOneBlog = asyncHandler(async (req, res) => {
@@ -200,6 +224,43 @@ const updateBlogStatus = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { blog }, "Blog status updated"));
 });
 
+const searchBlogs = asyncHandler(async (req, res) => {
+    const { query, page = 1, limit = 10, sortBy, sortType, } = req.query;
+
+    const searchQuery = query ? {
+        $or: [
+            { title: { $regex: query, $options: "i" } },
+            { content: { $regex: query, $options: "i" } }
+        ]
+    } : {};
+
+    const sortOptions = {};
+    if (sortBy) {
+        sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
+    } else {
+        sortOptions.createdAt = -1; // Default sorting by createdAt
+    }
+
+    const blogs = await Blog.find(searchQuery)
+        .sort(sortOptions)
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .populate("author", "username email");
+
+
+    const totalBlogs = await Blog.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalBlogs / limit);
+
+    return res.status(200).json(new ApiResponse(200, {
+        blogs,
+        totalBlogs,
+        totalPages,
+        currentPage: Number(page),
+        limit: Number(limit)
+    }, "Blogs fetched successfully"));
+});
+
 export {
     createBlog,
     getAllBlog,
@@ -208,5 +269,6 @@ export {
     updateBlog,
     deleteBlog,
     getMyBlogs,
-    updateBlogStatus
+    updateBlogStatus,
+    searchBlogs
 }
