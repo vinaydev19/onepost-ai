@@ -6,12 +6,12 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { User } from "../models/user.model.js"
 
 const createBlog = asyncHandler(async (req, res) => {
-    const { title, content, status } = req.body
+    const { title, content, status, category, tags } = req.body
 
     console.log([title, content, status]);
 
 
-    if ([title, content, status].some((field) => !field || field.trim() === "")) {
+    if ([title, content, status, category, tags].some((field) => !field || field.trim() === "")) {
         throw new ApiError(400, "all field are required")
     }
 
@@ -49,6 +49,8 @@ const createBlog = asyncHandler(async (req, res) => {
         title,
         content,
         status,
+        category,
+        tags,
         featuredImage: featuredImage.url,
         files: otherFiles
     })
@@ -134,12 +136,14 @@ const updateBlog = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Blog not found");
     }
 
-    const { title, content, status } = req.body;
+    const { title, content, status, category, tags } = req.body;
 
     const updates = {};
     if (title) updates.title = title;
     if (content) updates.content = content;
     if (status) updates.status = status;
+    if (category) updates.category = category;
+    if (tags) updates.tags = tags;
 
     // TODO:
 
@@ -260,6 +264,47 @@ const searchBlogs = asyncHandler(async (req, res) => {
         limit: Number(limit)
     }, "Blogs fetched successfully"));
 });
+
+const searchBlogsByCategory = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, category, sortBy, sortType } = req.query
+
+    if (!category) {
+        throw new ApiError()
+    }
+
+    const searchQuery = { category: { $regex: category, $options: 1 } }
+
+    const sortOptions = {}
+    if (sortBy) {
+        sortOptions[sortBy] = sortBy === "desc" ? -1 : 1
+    } else {
+        sortOptions.createdAt = -1
+    }
+
+    const skip = (page - 1) * limit
+
+    const blogs = await Blog.find({ searchQuery })
+        .sort(sortOptions)
+        .skip((skip))
+        .limit(Number(limit))
+        .populate("author", "username email");
+
+    const totalBlogs = await Blog.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalBlogs / limit);
+
+
+    return res.status(200).json(new ApiResponse(200, {
+        blogs,
+        totalBlogs,
+        totalPages,
+        currentPage: Number(page),
+        limit: Number(limit),
+    }, "Blogs fetched successfully"))
+})
+
+
+
 
 export {
     createBlog,

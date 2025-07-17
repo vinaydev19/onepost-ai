@@ -33,6 +33,18 @@ const blogSchema = new mongoose.Schema({
         default: "Draft",
         index: true
     },
+    category: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    tags: [
+        {
+            type: String,
+            required: true,
+            unique: true
+        }
+    ]
 }, { timestamps: true })
 
 
