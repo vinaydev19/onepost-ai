@@ -23,6 +23,7 @@ import blogRouter from "./routes/blog.routes.js"
 import commentRouter from "./routes/comment.routes.js"
 import likeRouter from "./routes/like.routes.js"
 import followRouter from "./routes/follow.routes.js"
+import readingListRouter from "./routes/readingList.routes.js"
 
 
 
@@ -32,6 +33,7 @@ app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/likes", likeRouter);
 app.use("/api/v1/follows", followRouter);
+app.use("/api/v1/readingLists", readingListRouter);
 
 
 // error handler
