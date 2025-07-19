@@ -303,9 +303,6 @@ const searchBlogsByCategory = asyncHandler(async (req, res) => {
     }, "Blogs fetched successfully"))
 })
 
-
-
-
 export {
     createBlog,
     getAllBlog,
@@ -315,5 +312,6 @@ export {
     deleteBlog,
     getMyBlogs,
     updateBlogStatus,
-    searchBlogs
+    searchBlogs,
+    searchBlogsByCategory
 }

@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
-import { readingList } from "../models/readingList.model.js"
+import { ReadingList } from "../models/readingList.model.js"
 
 const createReadingList = asyncHandler(async (req, res) => {
     const { name, description } = req.body;
@@ -11,7 +11,7 @@ const createReadingList = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Reading list name is required");
     }
 
-    const newReadingList = await readingList.create({
+    const newReadingList = await ReadingList.create({
         name,
         description,
         userId
@@ -23,7 +23,7 @@ const createReadingList = asyncHandler(async (req, res) => {
 const getReadingLists = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
-    const readingLists = await readingList.find({ userId }).populate("blog");
+    const readingLists = await ReadingList.find({ userId }).populate("blog");
 
     if (!readingLists || readingLists.length === 0) {
         throw new ApiError(404, "No reading lists found");
@@ -36,7 +36,7 @@ const deleteReadingList = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userId = req.user._id;
 
-    const readingListToDelete = await readingList.findOneAndDelete({ _id: id, userId });
+    const readingListToDelete = await ReadingList.findOneAndDelete({ _id: id, userId });
 
     if (!readingListToDelete) {
         throw new ApiError(404, "Reading list not found");
@@ -54,7 +54,7 @@ const updateReadingList = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Reading list name is required");
     }
 
-    const updatedReadingList = await readingList.findOneAndUpdate(
+    const updatedReadingList = await ReadingList.findOneAndUpdate(
         { _id: id, userId },
         { name, description },
         { new: true }
@@ -82,24 +82,24 @@ const toggleBlogInReadingList = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Reading list not found or you do not have access");
     }
 
-    const blogIndex = readingList.blog.findIndex(
+    const blogIndex = ReadingList.blog.findIndex(
         (b) => b.toString() === blogId
     );
 
     if (blogIndex === -1) {
         // Add blog to the list
-        readingList.blog.push(blogId);
-        await readingList.save();
+        ReadingList.blog.push(blogId);
+        await ReadingList.save();
         return res
             .status(200)
-            .json(new ApiResponse(200, readingList, "Blog added to reading list"));
+            .json(new ApiResponse(200, ReadingList, "Blog added to reading list"));
     } else {
         // Remove blog from the list
-        readingList.blog.splice(blogIndex, 1);
-        await readingList.save();
+        ReadingList.blog.splice(blogIndex, 1);
+        await ReadingList.save();
         return res
             .status(200)
-            .json(new ApiResponse(200, readingList, "Blog removed from reading list"));
+            .json(new ApiResponse(200, ReadingList, "Blog removed from reading list"));
     }
 });
 
