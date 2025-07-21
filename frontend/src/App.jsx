@@ -1,11 +1,12 @@
 import React from 'react'
 import { Button } from './components/ui/button'
+import Login from './pages/Login'
+import Register from './pages/Register'
 
 function App() {
   return (
     <div>
-      <h1>App</h1>
-      <Button variant="ghost">click me</Button>
+      <Register />
     </div>
   )
 }
