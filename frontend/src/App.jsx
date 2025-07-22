@@ -1,12 +1,14 @@
 import React from 'react'
-import { Button } from './components/ui/button'
-import Login from './pages/Login'
-import Register from './pages/Register'
+import Body from './pages/Body'
+import { Toaster } from 'react-hot-toast'
+
 
 function App() {
+  
   return (
     <div>
-      <Register />
+      <Body />
+      <Toaster />
     </div>
   )
 }
