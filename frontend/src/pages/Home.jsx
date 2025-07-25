@@ -1,7 +1,6 @@
-import Navbar from '@/components/layout/Navbar'
 import { Button } from '@/components/ui/button';
 import React, { useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import blogHero1 from "../assets/Logo.png";
@@ -130,9 +129,6 @@ function Home() {
         return selectedCategory === "All" || blog.category === selectedCategory
     })
 
-    console.log(viewMode);
-
-
     const sortedByBlogs = [...filteredPosts].sort((a, b) => {
         if (sortBy === "popular") {
             return b.likes - a.likes
@@ -143,15 +139,15 @@ function Home() {
         }
     })
 
-
     const user = {
         name: "John Doe",
         avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face",
         email: "john@example.com"
     };
+
+
     return (
         <div className='min-h-screen bg-[#020817]'>
-            <Navbar isAuthenticated={true} user={user} />
             <div className='container mx-auto px-4 py-8'>
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-6xl font-bold mb-6 text-[#6c46e2]">
@@ -236,12 +232,9 @@ function Home() {
                         Load More Articles
                     </Button>
                 </div>
-
             </div>
         </div>
     )
-
-
 }
 
 export default Home

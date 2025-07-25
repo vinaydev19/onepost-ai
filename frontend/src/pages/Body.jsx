@@ -6,6 +6,8 @@ import ProtectedRoute from '@/components/common/ProtectedRoute'
 import Profile from './Profile'
 import { RouterProvider } from 'react-router'
 import Home from './Home'
+import Explore from './Explore'
+import MainLayout from './MainLayout'
 
 function Body() {
     const router = createBrowserRouter(
@@ -15,8 +17,11 @@ function Body() {
                 <Route path='register' element={<Register />} />
 
                 <Route path='' element={<ProtectedRoute />}>
-                    <Route path='' element={<Home />} />
-                    <Route path='profile' element={<Profile />} />
+                    <Route element={<MainLayout />}>
+                        <Route path='' element={<Home />} />
+                        <Route path='profile' element={<Profile />} />
+                        <Route path='explore' element={<Explore />} />
+                    </Route>
                 </Route>
             </>
         )

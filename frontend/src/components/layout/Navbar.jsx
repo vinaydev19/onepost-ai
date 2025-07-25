@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { LogOut, Menu, Search, Settings, User, X } from 'lucide-react';
 import { Input } from '../ui/input';
 
-function Navbar({ isAuthenticated = false, user }) {
+function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigate();
@@ -22,6 +22,16 @@ function Navbar({ isAuthenticated = false, user }) {
     }
 
     const isActivePath = (path) => (location.pathname === path)
+
+    const user = {
+        name: "John Doe",
+        avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face",
+        email: "john@example.com"
+    };
+
+    const isAuthenticated = true
+
+
     return (
         <nav className='sticky top-0 z-50 w-full border-b bg-[#020817] text-white border-border'>
             <div className='container mx-auto px-4'>
