@@ -8,6 +8,7 @@ import { RouterProvider } from 'react-router'
 import Home from './Home'
 import Explore from './Explore'
 import MainLayout from './MainLayout'
+import ReadingLists from './ReadingLists'
 
 function Body() {
     const router = createBrowserRouter(
@@ -21,6 +22,7 @@ function Body() {
                         <Route path='' element={<Home />} />
                         <Route path='profile' element={<Profile />} />
                         <Route path='explore' element={<Explore />} />
+                        <Route path='reading-lists' element={<ReadingLists />} />
                     </Route>
                 </Route>
             </>
