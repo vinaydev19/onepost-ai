@@ -9,6 +9,11 @@ import Home from './Home'
 import Explore from './Explore'
 import MainLayout from './MainLayout'
 import ReadingLists from './ReadingLists'
+import ForgotPassword from './ForgotPassword'
+import VerifyOTP from './VerifyOTP'
+import PasswordReset from './PasswordReset'
+import PasswordChange from './PasswordChange'
+import EmailChange from './EmailChange'
 
 function Body() {
     const router = createBrowserRouter(
@@ -16,6 +21,11 @@ function Body() {
             <>
                 <Route path='login' element={<Login />} />
                 <Route path='register' element={<Register />} />
+                <Route path="forgot-password" element={<ForgotPassword />} />
+                <Route path="verify-otp" element={<VerifyOTP />} />
+                <Route path="password-reset" element={<PasswordReset />} />
+                <Route path="password-change" element={<PasswordChange />} />
+                <Route path="email-change" element={<EmailChange />} />
 
                 <Route path='' element={<ProtectedRoute />}>
                     <Route element={<MainLayout />}>
