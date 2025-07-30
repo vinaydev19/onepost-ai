@@ -4,14 +4,31 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { useVerifyMutation } from '@/redux/api/userApiSlice';
+import toast from 'react-hot-toast';
+import { LoaderTwo } from '@/components/ui/loader';
 
 function VerifyOTP() {
   const [otp, setOtp] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [verify, { isLoading }] = useVerifyMutation()
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log();
+
+    try {
+      const res = await verify({ code: otp }).unwrap()
+      toast.success(res.data.message)
+      console.log(res);
+      navigate('/login')
+    } catch (error) {
+      console.log(`something want wrong while verify OTP`);
+      console.log(error);
+      toast.error(error.data.message)
+    }
   }
 
   return (
@@ -45,7 +62,7 @@ function VerifyOTP() {
               </InputOTP>
             </div>
             <Button type="submit" className="w-full bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105" disabled={isLoading || otp.length !== 4}>
-              {isLoading ? "Verifying..." : "Verify Code"}
+              {isLoading ? <LoaderTwo /> : "Verify Code"}
             </Button>
             <div className="text-center space-y-2">
               <p className="text-sm text-gray-400">

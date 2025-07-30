@@ -43,10 +43,10 @@ export const readingListApiSlice = apiSlice.injectEndpoints({
     }),
 });
 
-export {
+export const {
     useCreateReadingListMutation,
     useGetReadingListsQuery,
     useDeleteReadingListMutation,
     useUpdateReadingListMutation,
     useToggleBlogInReadingListMutation,
-}
+} = readingListApiSlice;

@@ -314,7 +314,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 const updateUserProfilePic = asyncHandler(async (req, res) => {
     const profilePicLocalPath = req.file?.path;
     console.log("profilePicLocalPath", req.file);
-    
+
 
     if (!profilePicLocalPath) {
         throw new ApiResponse(400, "profilePic file missing");

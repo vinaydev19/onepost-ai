@@ -25,8 +25,8 @@ export const followApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export {
+export const {
   useToggleFollowMutation,
   useGetFollowersQuery,
   useGetFollowingQuery,
-}
+} = followApiSlice

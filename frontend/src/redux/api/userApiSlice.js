@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { USERS_URL } from "../constants";
-import { getMyProfile } from "../features/userSlice";
+import { getMyProfile, getUser } from "../features/userSlice";
 
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -17,6 +17,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 method: "POST",
                 body: data
             }),
+            async onQueryStarted(params, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    dispatch(getUser(data))
+                } catch (error) {
+                    console.log(`error while login ${error}`);
+
+                }
+            }
         }),
         verify: builder.mutation({
             query: (data) => ({
@@ -104,7 +113,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
             providesTags: ["User"],
             async onQueryStarted(params, { dispatch, queryFulfilled }) {
                 try {
-                    const { data } = await queryFulfilled
+                    const { data } = await queryFulfilled;
                     dispatch(getMyProfile(data))
                 } catch (error) {
                     console.log(`error while fetch user profile`);
@@ -116,7 +125,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
 })
 
 
-export {
+export const {
     useRegisterMutation,
     useLoginMutation,
     useVerifyMutation,
@@ -125,10 +134,9 @@ export {
     useResetPasswordMutation,
     useLogoutMutation,
     useRefreshTokenMutation,
-    useAccountUpdateMutation,
     useProfilePictureMutation,
     usePasswordChangeMutation,
     useEmailChangeMutation,
     useEmailConfirmMutation,
     useProfileQuery,
-}
+} = userApiSlice

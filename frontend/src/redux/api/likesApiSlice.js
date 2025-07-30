@@ -32,9 +32,9 @@ export const likeApiSlice = apiSlice.injectEndpoints({
     }),
 });
 
-export {
+export const {
     useToggleBlogLikeMutation,
     useToggleCommentLikeMutation,
     useGetBlogLikesQuery,
     useGetCommentLikesQuery,
-}
+} = likeApiSlice

@@ -35,9 +35,9 @@ export const commentApiSlice = apiSlice.injectEndpoints({
     }),
 });
 
-export {
+export const {
     useGetCommentsQuery,
     useCreateCommentMutation,
     useUpdateCommentMutation,
     useDeleteCommentMutation,
-}
+} = commentApiSlice

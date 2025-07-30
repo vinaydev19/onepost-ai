@@ -4,7 +4,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardDescription, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
+import { Link, useNavigate } from 'react-router-dom'
+import toast from "react-hot-toast";
+import { LoaderOne, LoaderTwo } from '@/components/ui/loader'
+import { useRegisterMutation } from '@/redux/api/userApiSlice'
 
 
 function Register() {
@@ -15,7 +19,7 @@ function Register() {
     password: '',
   })
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const passwordValidation = {
     minLength: formData.password.length >= 8,
@@ -23,11 +27,27 @@ function Register() {
     hasLetter: /[a-zA-Z]/.test(formData.password),
     hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
   };
-
   const isPasswordVaild = Object.values(passwordValidation).every(Boolean)
 
-  const handleSubmitForm = async (e) => {
 
+  const [register, { isLoading }] = useRegisterMutation()
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+
+    console.log(formData);
+
+
+    try {
+      const res = await register(formData).unwrap()
+      toast.success(res.data.message)
+      console.log(res);
+      navigate('/verify-otp')
+    } catch (error) {
+      console.log(`something want wrong while register`);
+      console.log(error);
+      toast.error(error.data.message)
+    }
   }
 
   const handleInputChange = (e) => {
@@ -60,13 +80,13 @@ function Register() {
           <CardContent className="space-y-4">
             <form onSubmit={handleSubmitForm} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="fullName">Full Name</Label>
                 <Input
-                  id="name"
-                  name="name"
+                  id="fullName"
+                  name="fullName"
                   type="text"
                   placeholder="Enter your full name"
-                  value={formData.name}
+                  value={formData.fullName}
                   onChange={handleInputChange}
                   required
                   className="transition-all focus:shadow-card"
@@ -156,7 +176,7 @@ function Register() {
                 className="w-full bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating account..." : "Create account"}
+                {isLoading ? <LoaderTwo /> : "Create account"}
               </Button>
             </form>
 
@@ -192,9 +212,9 @@ function Register() {
 
             <div className="text-center text-sm">
               <span className="text-muted-foreground">Already have an account? </span>
-              <div to="/login" className="text-primary hover:underline font-medium">
+              <Link to="/login" className="text-primary hover:underline font-medium">
                 Sign in
-              </div>
+              </Link>
             </div>
           </CardContent>
         </Card>

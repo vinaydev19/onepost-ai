@@ -6,6 +6,7 @@ import { Card, CardDescription, CardContent, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { PenTool, Eye, EyeOff } from "lucide-react";
+import { Link } from 'react-router-dom'
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -136,9 +137,9 @@ function Login() {
 
                         <div className="text-center text-sm">
                             <span className="text-muted-foreground">Don't have an account? </span>
-                            <div to="/register" className="text-primary hover:underline font-medium">
+                            <Link to="/register" className="text-primary hover:underline font-medium">
                                 Sign up
-                            </div>
+                            </Link>
                         </div>
                     </CardContent>
                 </Card>

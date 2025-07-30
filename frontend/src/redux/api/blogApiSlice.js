@@ -76,7 +76,7 @@ export const blogApiSlice = apiSlice.injectEndpoints({
     }),
 });
 
-export {
+export const {
     useCreateBlogMutation,
     useGetAllBlogsQuery,
     useGetBlogBySlugQuery,
@@ -87,4 +87,4 @@ export {
     useUpdateBlogStatusMutation,
     useSearchBlogsQuery,
     useSearchBlogsByCategoryQuery,
-}
+} = blogApiSlice

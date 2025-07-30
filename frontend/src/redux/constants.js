@@ -1,4 +1,4 @@
-export const BASE_URL = import.meta.env.BACKEND_ENDPOINT
+export const BASE_URL = import.meta.env.VITE_BACKEND_ENDPOINT;
 export const USERS_URL = "/api/v1/users"
 export const BLOGS_URL = "/api/v1/blogs"
 export const COMMENTS_URL = "/api/v1/comments"
