@@ -40,7 +40,7 @@ function Register() {
 
     try {
       const res = await register(formData).unwrap()
-      toast.success(res.data.message)
+      toast.success(res.message)
       console.log(res);
       navigate('/verify-otp')
     } catch (error) {

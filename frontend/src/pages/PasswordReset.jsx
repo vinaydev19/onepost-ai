@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CheckCircle, Eye, EyeOff, Lock, XCircle } from 'lucide-react';
+import { useResetPasswordMutation } from '@/redux/api/userApiSlice';
+import toast from 'react-hot-toast';
 
 function PasswordReset() {
   const [formData, setFormData] = useState({
@@ -13,12 +15,10 @@ function PasswordReset() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const passwordValidation = {
     minLength: formData.password.length >= 8,
-    hasUpper: /[A-Z]/.test(formData.password),
     hasLower: /[a-z]/.test(formData.password),
     hasNumber: /\d/.test(formData.password),
     hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
@@ -27,8 +27,28 @@ function PasswordReset() {
   const isPasswordValid = Object.values(passwordValidation).every(Boolean);
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
 
-  const handleSubmit = (e) => {
+  const [resetpassword, { isLoading }] = useResetPasswordMutation()
+  const [searchParams] = useSearchParams()
 
+  const token = searchParams.get("token")
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await resetpassword({
+        token,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      }).unwrap()
+      toast.success(res.message)
+      console.log(res);
+      navigate('/login')
+    } catch (error) {
+      console.log(`something want wrong while forgot password`);
+      console.log(error);
+      toast.error(error.data.message)
+    }
   }
 
   const handleInputChange = (e) => {

@@ -2,16 +2,31 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useResetTokenMutation } from '@/redux/api/userApiSlice';
 import { ArrowLeft, Mail } from 'lucide-react';
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate()
 
-    const handleSubmit = (e) => {
+    const [resetToken, { isLoading }] = useResetTokenMutation()
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await resetToken({email}).unwrap()
+            toast.success(res.message)
+            console.log(res);
+            navigate('/password-reset')
+        } catch (error) {
+            console.log(`something want wrong while forgot password`);
+            console.log(error);
+            toast.error(error.data.message)
+        }
     }
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#020817] p-4">

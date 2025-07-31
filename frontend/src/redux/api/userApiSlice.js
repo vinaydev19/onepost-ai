@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { USERS_URL } from "../constants";
-import { getMyProfile, getUser } from "../features/userSlice";
+import { getEmail, getMyProfile, getUser } from "../features/userSlice";
 
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -10,6 +10,14 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 method: "POST",
                 body: data
             }),
+            async onQueryStarted(params, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    dispatch(getEmail(data.data.loggedUser.email))
+                } catch (error) {
+                    console.log(`error while register ${error}`);
+                }
+            }
         }),
         login: builder.mutation({
             query: (data) => ({
@@ -20,10 +28,9 @@ export const userApiSlice = apiSlice.injectEndpoints({
             async onQueryStarted(params, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    dispatch(getUser(data))
+                    dispatch(getUser(data.data.loggedUser))
                 } catch (error) {
                     console.log(`error while login ${error}`);
-
                 }
             }
         }),
@@ -117,7 +124,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
                     dispatch(getMyProfile(data))
                 } catch (error) {
                     console.log(`error while fetch user profile`);
-
                 }
             }
         }),

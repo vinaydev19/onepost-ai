@@ -269,7 +269,7 @@ export const Reset_Password_Email_Template = `
           <div class="content">
               <p>Hello,</p>
               <p>We received a request to reset your password for <strong>onePost AI</strong>. by entering the code below:</p>
-            <a href="{link}">d</a>
+            <a href="{link}">Click Here</a>
               <p>If you didn’t request a password reset, you can safely ignore this email.</p>
               <p>For further assistance, feel free to contact our support team.</p>
           </div>

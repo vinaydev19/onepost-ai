@@ -4,28 +4,49 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { useVerifyMutation } from '@/redux/api/userApiSlice';
+import { useResendVerificationMutation, useVerifyMutation } from '@/redux/api/userApiSlice';
 import toast from 'react-hot-toast';
 import { LoaderTwo } from '@/components/ui/loader';
+import { useDispatch, useSelector } from 'react-redux';
+import { getEmail } from '@/redux/features/userSlice';
 
 function VerifyOTP() {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
   const [verify, { isLoading }] = useVerifyMutation()
+  const [resendVerification, { isLoading: isLoadingTwo }] = useResendVerificationMutation()
+  const email = useSelector((state) => state.user.email)
+  const dispatch = useDispatch()
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log();
-
     try {
       const res = await verify({ code: otp }).unwrap()
-      toast.success(res.data.message)
+      toast.success(res.message)
       console.log(res);
+      dispatch(getEmail(null))
       navigate('/login')
     } catch (error) {
       console.log(`something want wrong while verify OTP`);
+      console.log(error);
+      toast.error(error.data.message)
+    }
+  }
+
+  const resetOTP = async (e) => {
+    e.preventDefault();
+
+    console.log(email);
+
+    try {
+      const res = await resendVerification({ email: email }).unwrap()
+      toast.success(res.message)
+      console.log(res);
+    } catch (error) {
+      console.log(`something want wrong while resend the OTP`);
       console.log(error);
       toast.error(error.data.message)
     }
@@ -64,15 +85,15 @@ function VerifyOTP() {
             <Button type="submit" className="w-full bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105" disabled={isLoading || otp.length !== 4}>
               {isLoading ? <LoaderTwo /> : "Verify Code"}
             </Button>
-            <div className="text-center space-y-2">
-              <p className="text-sm text-gray-400">
-                Didn't receive the code?
-              </p>
-              <Button variant="ghost" className="text-sm cursor-pointer hover:bg-[#1e293b]">
-                Resend code
-              </Button>
-            </div>
           </form>
+          <div className="text-center mt-3 space-y-2">
+            <p className="text-sm text-gray-400">
+              Didn't receive the code?
+            </p>
+            <Button variant="ghost" onClick={resetOTP} className="text-sm cursor-pointer hover:bg-[#1e293b]">
+              {isLoadingTwo ? <LoaderTwo /> : "Resend Code"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

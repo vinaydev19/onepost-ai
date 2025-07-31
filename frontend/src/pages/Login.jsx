@@ -6,7 +6,10 @@ import { Card, CardDescription, CardContent, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { PenTool, Eye, EyeOff } from "lucide-react";
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useLoginMutation } from '@/redux/api/userApiSlice'
+import { LoaderTwo } from '@/components/ui/loader'
+import toast from 'react-hot-toast'
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -14,7 +17,9 @@ function Login() {
         password: '',
     })
     const [showPassword, setShowPassword] = useState(false)
-    const [isLoading, setisLoading] = useState(false);
+    const navigate = useNavigate()
+
+    const [login, { isLoading }] = useLoginMutation()
 
     const handleInputChange = (e) => {
         setFormData((prev) => ({
@@ -24,7 +29,20 @@ function Login() {
     }
 
     const handleSubmitForm = async (e) => {
-        console.log("submited");
+        e.preventDefault();
+
+        console.log(formData);
+
+        try {
+            const res = await login(formData).unwrap()
+            toast.success(res.message)
+            console.log(res);
+            navigate('/')
+        } catch (error) {
+            console.log(`something want wrong while login`);
+            console.log(error);
+            toast.error(error.data.message)
+        }
     }
     return (
         <div className='min-h-screen bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-500 flex items-center justify-center p-4'>
@@ -101,7 +119,7 @@ function Login() {
                                 className="w-full bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105"
                                 disabled={isLoading}
                             >
-                                {isLoading ? "Signing in..." : "Sign in"}
+                                {isLoading ? <LoaderTwo /> : "Sign in"}
                             </Button>
                         </form>
 

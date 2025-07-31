@@ -158,7 +158,11 @@ const userLogin = asyncHandler(async (req, res) => {
 
     const loggedUser = await User.findById(findUser._id).select("-password -refreshToken");
 
-    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json(new ApiResponse(200, { loggedUser }, "login successfully"))
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200, { loggedUser, accessToken, refreshToken }, "login successfully"))
 })
 
 const userLogout = asyncHandler(async (req, resp) => {
@@ -244,12 +248,11 @@ const resetPasswordTokenGenerate = asyncHandler(async (req, res) => {
 
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.RESETPASSWORD_TOKEN_SECRET, { expiresIn: process.env.RESETPASSWORD_TOKEN_EXPIRY })
 
-    const resetPasswordLink = `http://localhost:5173/resetpassword?id=${user._id}&token=${token}`
-
+    const resetPasswordLink = `${process.env.CLIENT_URL}/password-reset?id=${user._id}&token=${token}`
 
     user.resetPasswordToken = token;
     user.resetPasswordTokenExpiresAt = Date.now() + 60 * 60 * 1000;
-    await user.save({ validateBeforeSave: false });
+    await user.save();
 
 
     await resetPasswordTokenSent(email, resetPasswordLink)
@@ -260,7 +263,7 @@ const resetPasswordTokenGenerate = asyncHandler(async (req, res) => {
 const resetPassword = asyncHandler(async (req, res) => {
     const { token, password, confirmPassword } = req.body
 
-    if (!token && !password && !confirmPassword) {
+    if (!token || !password || !confirmPassword) {
         throw new ApiError(400, "all field are required")
     }
 
@@ -280,7 +283,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     await user.save();
 
     await resetPasswordConfirmationEmail(user.email, user.username)
-
 
     return res.status(200).json(new ApiResponse(200, {}, "password reset successfully"))
 
