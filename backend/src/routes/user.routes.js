@@ -14,7 +14,9 @@ import {
     changeCurrentPassword,
     emailChangeConfirmation,
     getCurrentUser,
-    emailChangeVerification
+    emailChangeVerification,
+    getReadingHistory,
+    getBloggerProfile
 } from "../controllers/user.controller.js";
 
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -42,5 +44,8 @@ router.put('/profile-picture', verifyJWT, upload.single('profilePic'), updateUse
 router.put('/password/change', verifyJWT, changeCurrentPassword);
 router.put('/email/change', verifyJWT, emailChangeVerification);
 router.post('/email/confirm', verifyJWT, emailChangeConfirmation);
+
+router.route("/profile/:username").get(verifyJWT, getBloggerProfile)
+router.route("/history").get(verifyJWT, getReadingHistory)
 
 export default router;

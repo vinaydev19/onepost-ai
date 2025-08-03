@@ -7,6 +7,7 @@ import { resetPasswordConfirmationEmail, resetPasswordTokenSent, sendVerificatio
 import { oauth2Client } from "../utils/googleConfig.js"
 import axios from "axios"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { Mongoose } from "mongoose"
 
 const options = {
     httpOnly: true,
@@ -555,10 +556,13 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
             $project: {
                 fullName: 1,
                 username: 1,
+                email: 1,
+                bio: 1,
                 followersCount: 1,
                 followingCount: 1,
                 isFollowingCount: 1,
-                profilePic: 1
+                profilePic: 1,
+                createdAt: 1
             }
         }
     ])
@@ -570,6 +574,59 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, follow[0], "user follow fetched succesfully"))
 
 
+})
+
+const getReadingHistory = asyncHandler(async (req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: new Mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup: {
+                from: "blogs",
+                localField: "readingHistory",
+                foreignField: "_id",
+                as: "readingHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "author",
+                            foreignField: "_id",
+                            as: "author",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        username: 1,
+                                        profilePic: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            author: {
+                                $first: "$author"
+                            }
+                        }
+                    }
+                ],
+            }
+        }
+    ])
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                user[0].readingHistory,
+                "reading history fetched successfully"
+            )
+        )
 })
 
 export {
@@ -588,5 +645,6 @@ export {
     emailChangeConfirmation,
     getCurrentUser,
     emailChangeVerification,
-    getBloggerProfile
+    getBloggerProfile,
+    getReadingHistory,
 }

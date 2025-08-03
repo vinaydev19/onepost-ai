@@ -50,7 +50,13 @@ const userSchema = new mongoose.Schema({
     verificationTimeout: {
         type: Date,
         index: { expires: 0 },
-    }
+    },
+    readingHistory: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Blog"
+        }
+    ],
 }, { timestamps: true })
 
 userSchema.pre("save", async function (next) {

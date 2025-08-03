@@ -113,7 +113,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 body: data
             }),
         }),
-        profile: builder.query({
+        getCurrentUser: builder.query({
             query: () => ({
                 url: `${USERS_URL}/me`,
             }),
@@ -121,9 +121,22 @@ export const userApiSlice = apiSlice.injectEndpoints({
             async onQueryStarted(params, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
+                    dispatch(getUser(data))
+                } catch (error) {
+                    console.log(`error while fetch user`);
+                }
+            }
+        }),
+        getUserProfile: builder.query({
+            query: (username) => ({
+                url: `${USERS_URL}/profile/${username}`
+            }),
+            async onQueryStarted(params, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled
                     dispatch(getMyProfile(data))
                 } catch (error) {
-                    console.log(`error while fetch user profile`);
+                    console.log(`error while fetch profile ${error}`);
                 }
             }
         }),
@@ -144,5 +157,5 @@ export const {
     usePasswordChangeMutation,
     useEmailChangeMutation,
     useEmailConfirmMutation,
-    useProfileQuery,
+    useGetCurrentUserQuery
 } = userApiSlice

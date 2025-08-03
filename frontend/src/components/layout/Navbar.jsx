@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { LogOut, Menu, Search, Settings, User, X } from 'lucide-react';
 import { Input } from '../ui/input';
+import { useSelector } from 'react-redux';
 
 function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,7 +30,11 @@ function Navbar() {
         email: "john@example.com"
     };
 
-    const isAuthenticated = true
+
+    console.log(user);
+
+
+    const isAuthenticated = useSelector((state) => state.user.user);
 
 
     return (
@@ -124,10 +129,10 @@ function Navbar() {
                             </>
                         ) : (
                             <div className="hidden md:flex items-center space-x-2">
-                                <Button asChild variant="ghost" className='cursor-pointer' size="sm">
+                                <Button asChild variant="ghost" className='cursor-pointer bg-[#6c46e2]' size="sm">
                                     <Link to="/login">Sign In</Link>
                                 </Button>
-                                <Button asChild variant="default" className='cursor-pointer' size="sm">
+                                <Button asChild variant="default" className='cursor-pointer bg-[#6c46e2]' size="sm">
                                     <Link to="/register">Get Started</Link>
                                 </Button>
                             </div>

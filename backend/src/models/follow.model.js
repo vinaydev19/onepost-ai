@@ -2,12 +2,12 @@ import mongoose, { Schema } from "mongoose";
 
 const followSchema = new Schema({
   followerId: {
-    type: Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId, // 	The user who follows someone else
     ref: 'User',
     required: true
   },
   followingId: {
-    type: Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId, // 	The user who is being followed
     ref: 'User',
     required: true
   }
