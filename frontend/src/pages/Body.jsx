@@ -14,6 +14,7 @@ import VerifyOTP from './VerifyOTP'
 import PasswordReset from './PasswordReset'
 import PasswordChange from './PasswordChange'
 import EmailChange from './EmailChange'
+import Editor from './Editor'
 
 function Body() {
     const router = createBrowserRouter(
@@ -33,6 +34,7 @@ function Body() {
                         <Route path='profile' element={<Profile />} />
                         <Route path='explore' element={<Explore />} />
                         <Route path='reading-lists' element={<ReadingLists />} />
+                        <Route path='write-new-blog' element={<Editor />} />
                     </Route>
                 </Route>
             </>

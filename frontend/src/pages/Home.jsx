@@ -111,12 +111,26 @@ const mockPosts = [
 
 const blogCategories = [
     "All",
-    "Personal",
     "Technology",
+    "Programming",
     "Business",
-    "Design",
+    "Finance",
+    "Health",
+    "Fitness",
+    "Lifestyle",
     "Education",
-    "General"
+    "Travel",
+    "Food",
+    "Design",
+    "Writing",
+    "Music",
+    "Movies",
+    "Science",
+    "Environment",
+    "Parenting",
+    "Marketing",
+    "Spirituality",
+    "Productivity"
 ];
 
 
@@ -139,13 +153,6 @@ function Home() {
         }
     })
 
-    const user = {
-        name: "John Doe",
-        avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face",
-        email: "john@example.com"
-    };
-
-
     return (
         <div className='min-h-screen bg-[#020817]'>
             <div className='container mx-auto px-4 py-8'>
@@ -161,53 +168,44 @@ function Home() {
                     </Button>
                 </div>
 
-                <div className='flex flex-col md:flex-row gap-4 items-center justify-between mb-8'>
-                    <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full bg-[#1e293b] rounded-md md:w-auto">
-                        <TabsList>
-                            {
-                                blogCategories.map((category) => (
-                                    <TabsTrigger
-                                        key={category}
-                                        value={category}
-                                        className={`text-xs md:text-sm hover:cursor-pointer px-4 py-2 rounded-md transition-colors ${selectedCategory === category ? "bg-[#020817] text-white" : "text-slate-300 hover:text-white"}`}
-                                    >
-                                        {category}
-                                    </TabsTrigger>
+                <div className='flex flex-col md:flex-row gap-4 items-center justify-end mb-8'>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger className="w-full md:w-[200px] text-white">
+                            <SelectValue placeholder="Category" />
+                        </SelectTrigger>
+                        <SelectContent className="text-white bg-[#020817]">
+                            {blogCategories.map((category) => (
+                                <SelectItem key={category} className="hover:cursor-pointer hover:bg-[#1e293b]" value={category}>{category}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-40 md:w-[200px] text-white">
+                            <Filter className="h-4 w-4 mr-2" />
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="text-white bg-[#020817]">
+                            <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="latest">Latest</SelectItem>
+                            <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="popular">Most Popular</SelectItem>
+                            <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="comments">Most Discussed</SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                                ))
-                            }
-                        </TabsList>
-                    </Tabs>
-
-                    <div className="flex items-center gap-4 bg-[#020817] text-white">
-                        <Select value={sortBy} onValueChange={setSortBy}>
-                            <SelectTrigger className="w-40">
-                                <Filter className="h-4 w-4 mr-2" />
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="text-white">
-                                <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="latest">Latest</SelectItem>
-                                <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="popular">Most Popular</SelectItem>
-                                <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="comments">Most Discussed</SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                        <div className="flex border border-border rounded-md">
-                            <Button
-                                size="sm"
-                                onClick={() => setViewMode("card")}
-                                className={`rounded-r-none hover:cursor-pointer ${viewMode === "card" ? "bg-[#1e293b] text-white" : "text-slate-300 hover:text-white"}`}
-                            >
-                                <Grid className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                size="sm"
-                                onClick={() => setViewMode("list")}
-                                className={`rounded-r-none hover:cursor-pointer ${viewMode === "list" ? "bg-[#1e293b] text-white" : "text-slate-300 hover:text-white"}`}
-                            >
-                                <List className="h-4 w-4" />
-                            </Button>
-                        </div>
+                    <div className="flex border border-border rounded-md">
+                        <Button
+                            size="sm"
+                            onClick={() => setViewMode("card")}
+                            className={`rounded-r-none hover:cursor-pointer ${viewMode === "card" ? "bg-[#1e293b] text-white" : "text-slate-300 hover:text-white"}`}
+                        >
+                            <Grid className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={() => setViewMode("list")}
+                            className={`rounded-r-none hover:cursor-pointer ${viewMode === "list" ? "bg-[#1e293b] text-white" : "text-slate-300 hover:text-white"}`}
+                        >
+                            <List className="h-4 w-4" />
+                        </Button>
                     </div>
                 </div>
 
@@ -233,7 +231,7 @@ function Home() {
                     </Button>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

@@ -110,18 +110,32 @@ const mockPosts = [
 
 const blogCategories = [
   "All",
-  "Personal",
   "Technology",
+  "Programming",
   "Business",
-  "Design",
+  "Finance",
+  "Health",
+  "Fitness",
+  "Lifestyle",
   "Education",
-  "General"
+  "Travel",
+  "Food",
+  "Design",
+  "Writing",
+  "Music",
+  "Movies",
+  "Science",
+  "Environment",
+  "Parenting",
+  "Marketing",
+  "Spirituality",
+  "Productivity"
 ];
 
 function Explore() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popularity');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
 
   return (
@@ -150,17 +164,17 @@ function Explore() {
             <SelectTrigger className="w-full md:w-[200px] text-white">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
-            <SelectContent className="text-white">
+            <SelectContent className="text-white bg-[#020817]">
               {blogCategories.map((category) => (
                 <SelectItem key={category} className="hover:cursor-pointer hover:bg-[#1e293b]" value={category}>{category}</SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full md:w-[200px] text-white">
+            <SelectTrigger className="w-full md:w-[200px]  text-white">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent className="text-white">
+            <SelectContent className="text-white bg-[#020817]">
               <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="popularity">Most Popular</SelectItem>
               <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="recent">Most Recent</SelectItem>
               <SelectItem className="hover:cursor-pointer hover:bg-[#1e293b]" value="trending">Trending</SelectItem>

@@ -90,7 +90,7 @@ function Navbar() {
                                 </Button>
 
                                 <Button asChild variant="default" className='cursor-pointer bg-[#6c46e2]' size="sm">
-                                    <Link to="/write"
+                                    <Link to="/write-new-blog"
                                         className={`text-sm hover:cursor-pointer transition-transform duration-200 hover:scale-105 font-medium `}
                                     >
                                         Write
@@ -172,7 +172,7 @@ function Navbar() {
                             {isAuthenticated ? (
                                 <>
                                     <Link to="/reading-lists" className="block cursor-pointer py-2 text-sm font-medium">Reading Lists</Link>
-                                    <Link to="/write" className="block py-2 cursor-pointer text-sm font-medium">Write</Link>
+                                    <Link to="/write-new-blog" className="block py-2 cursor-pointer text-sm font-medium">Write</Link>
                                     <Link to="/profile" className="block py-2 cursor-pointer text-sm font-medium">Profile</Link>
                                     <Link to="/settings" className="block py-2 cursor-pointer text-sm font-medium">Settings</Link>
                                     <button className="block py-2 text-sm font-medium cursor-pointer text-destructive text-left">Sign Out</button>
