@@ -36,12 +36,32 @@ const blogSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        unique: true
+        enum: [
+            "Technology",
+            "Programming",
+            "Business",
+            "Finance",
+            "Health",
+            "Fitness",
+            "Lifestyle",
+            "Education",
+            "Travel",
+            "Food",
+            "Design",
+            "Writing",
+            "Music",
+            "Movies",
+            "Science",
+            "Environment",
+            "Parenting",
+            "Marketing",
+            "Spirituality",
+            "Productivity"
+        ]
     },
     tags: [
         {
             type: String,
-            unique: true
         }
     ]
 }, { timestamps: true })
