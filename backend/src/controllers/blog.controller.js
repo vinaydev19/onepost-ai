@@ -63,36 +63,50 @@ const createBlog = asyncHandler(async (req, res) => {
 })
 
 const getAllBlog = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, sortBy = "createdAt", sortType = "desc" } = req.query
+    const {
+        query,
+        category,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        sortType = "desc"
+    } = req.query;
 
-    const skip = (page - 1) * limit;
+    const searchQuery = {};
 
-    const sortOptions = {};
-    if (sortBy) {
-        sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
-    } else {
-        sortOptions.createdAt = -1;
+    if (query) {
+        searchQuery.$or = [
+            { title: { $regex: query, $options: "i" } },
+            { content: { $regex: query, $options: "i" } }
+        ];
     }
 
-    const allBlogs = await Blog.find({})
+    if (category && category !== "All") {
+        searchQuery.category = category;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const sortOptions = {};
+    sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
+
+    const blogs = await Blog.find(searchQuery)
         .sort(sortOptions)
-        .limit(Number(limit))
         .skip(skip)
+        .limit(Number(limit))
         .populate("author", "username email");
 
-
-    const totalBlogs = await Blog.countDocuments({});
-
+    const totalBlogs = await Blog.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalBlogs / limit);
 
     return res.status(200).json(new ApiResponse(200, {
-        blogs: allBlogs,
+        blogs,
         totalBlogs,
         totalPages,
         currentPage: Number(page),
         limit: Number(limit)
-    }, "all blogs fetched successfully"))
-})
+    }, "Blogs fetched successfully"));
+});
 
 const getOneBlog = asyncHandler(async (req, res) => {
     const slug = req.params.slug
@@ -228,80 +242,6 @@ const updateBlogStatus = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { blog }, "Blog status updated"));
 });
 
-const searchBlogs = asyncHandler(async (req, res) => {
-    const { query, page = 1, limit = 10, sortBy, sortType, } = req.query;
-
-    const searchQuery = query ? {
-        $or: [
-            { title: { $regex: query, $options: "i" } },
-            { content: { $regex: query, $options: "i" } }
-        ]
-    } : {};
-
-    const sortOptions = {};
-    if (sortBy) {
-        sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
-    } else {
-        sortOptions.createdAt = -1; // Default sorting by createdAt
-    }
-
-    const blogs = await Blog.find(searchQuery)
-        .sort(sortOptions)
-        .skip((page - 1) * limit)
-        .limit(Number(limit))
-        .populate("author", "username email");
-
-
-    const totalBlogs = await Blog.countDocuments(searchQuery);
-
-    const totalPages = Math.ceil(totalBlogs / limit);
-
-    return res.status(200).json(new ApiResponse(200, {
-        blogs,
-        totalBlogs,
-        totalPages,
-        currentPage: Number(page),
-        limit: Number(limit)
-    }, "Blogs fetched successfully"));
-});
-
-const searchBlogsByCategory = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, category, sortBy, sortType } = req.query
-
-    if (!category) {
-        throw new ApiError()
-    }
-
-    const searchQuery = { category: { $regex: category, $options: 1 } }
-
-    const sortOptions = {}
-    if (sortBy) {
-        sortOptions[sortBy] = sortBy === "desc" ? -1 : 1
-    } else {
-        sortOptions.createdAt = -1
-    }
-
-    const skip = (page - 1) * limit
-
-    const blogs = await Blog.find({ searchQuery })
-        .sort(sortOptions)
-        .skip((skip))
-        .limit(Number(limit))
-        .populate("author", "username email");
-
-    const totalBlogs = await Blog.countDocuments(searchQuery);
-
-    const totalPages = Math.ceil(totalBlogs / limit);
-
-
-    return res.status(200).json(new ApiResponse(200, {
-        blogs,
-        totalBlogs,
-        totalPages,
-        currentPage: Number(page),
-        limit: Number(limit),
-    }, "Blogs fetched successfully"))
-})
 
 export {
     createBlog,
@@ -312,6 +252,4 @@ export {
     deleteBlog,
     getMyBlogs,
     updateBlogStatus,
-    searchBlogs,
-    searchBlogsByCategory
 }

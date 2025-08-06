@@ -8,8 +8,6 @@ import {
     deleteBlog,
     getMyBlogs,
     updateBlogStatus,
-    searchBlogs,
-    searchBlogsByCategory
 } from "../controllers/blog.controller.js";
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
@@ -42,10 +40,5 @@ router.get('/author-blogs/:username', getAllBlogByAuthor);
 router.get('/my-blogs', verifyJWT, getMyBlogs);
 router.patch('/update-blog-status/:id', verifyJWT, updateBlogStatus);
 
-// Search blogs
-router.get('/search', verifyJWT, searchBlogs);
-
-// search blogs based on 
-router.get('/search', verifyJWT, searchBlogsByCategory)
 
 export default router;
