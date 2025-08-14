@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice";
 import { BLOGS_URL } from "../constants";
+import { getBlogs } from "../features/blogSlice";
 
 export const blogApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -12,10 +13,20 @@ export const blogApiSlice = apiSlice.injectEndpoints({
             invalidatesTags: ["Blog"],
         }),
         getAllBlogs: builder.query({
-            query: () => ({
+            query: ({ page = 1, limit = 10, sortBy = "createdAt", sortType = "desc", category = "All", query = "" }) => ({
                 url: `${BLOGS_URL}/get-blogs`,
+                params: { page, limit, sortBy, sortType, category, query }
             }),
             providesTags: ["Blog"],
+            async onQueryStarted(params, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled
+                    dispatch(getBlogs(data))
+                } catch (error) {
+                    console.log("something want wrong while fetch the blogs", error);
+
+                }
+            }
         }),
         getBlogBySlug: builder.query({
             query: (slug) => ({
@@ -58,21 +69,6 @@ export const blogApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ["Blog"],
         }),
-        searchBlogs: builder.query({
-            query: (params) => ({
-                url: `${BLOGS_URL}/search`,
-                params,
-            }),
-            providesTags: ["Blog"],
-        }),
-        // ⚠️ Fix backend to avoid duplicate `/search` route!
-        searchBlogsByCategory: builder.query({
-            query: (params) => ({
-                url: `${BLOGS_URL}/search`,
-                params,
-            }),
-            providesTags: ["Blog"],
-        }),
     }),
 });
 
@@ -85,6 +81,4 @@ export const {
     useGetBlogsByAuthorQuery,
     useGetMyBlogsQuery,
     useUpdateBlogStatusMutation,
-    useSearchBlogsQuery,
-    useSearchBlogsByCategoryQuery,
 } = blogApiSlice

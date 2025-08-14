@@ -2,10 +2,11 @@ import BlogCard from '@/components/common/BlogCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import blogHero1 from "../assets/Logo.png";
 import blogHero2 from "../assets/Logo.png";
 import blogHero3 from "../assets/Logo.png";
+import { useGetAllBlogsQuery } from '@/redux/api/blogApiSlice';
 
 
 
@@ -137,6 +138,28 @@ function Explore() {
   const [sortBy, setSortBy] = useState('popularity');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  const [allBlogs, setAllBlogs] = useState([])
+
+  const { data, isLoading } = useGetAllBlogsQuery({})
+
+  console.log(allBlogs);
+
+  useEffect(() => {
+    if (data?.data?.blogs) {
+      setAllBlogs(data.data.blogs);
+    }
+  }, [data]);
+
+
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#020817] flex items-center justify-center text-white">
+        Loading blogs...
+      </div>
+    );
+  }
+
 
   return (
     <div className='min-h-screen bg-[#020817]'>
@@ -186,8 +209,8 @@ function Explore() {
         <div className="flex items-center gap-2 mb-6">
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {mockPosts.map((blog) => (
-            <BlogCard key={`trending-${blog.id}`} post={blog} />
+          {allBlogs.map((blog) => (
+            <BlogCard key={`trending-${blog._id}`} post={blog} />
           ))}
         </div>
       </div>

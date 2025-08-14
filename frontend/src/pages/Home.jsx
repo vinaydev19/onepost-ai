@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -8,105 +8,7 @@ import blogHero2 from "../assets/Logo.png";
 import blogHero3 from "../assets/Logo.png";
 import { Filter, Grid, List } from 'lucide-react';
 import BlogCard from '@/components/common/BlogCard';
-
-// Mock data for demonstration
-const mockPosts = [
-    {
-        id: "1",
-        title: "The Future of Web Development: Trends to Watch in 2024",
-        excerpt: "Explore the latest trends shaping the future of web development...",
-        content: "Full article content here...",
-        coverImage: blogHero1,
-        author: {
-            name: "Sarah Chen",
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-            username: "sarahchen"
-        },
-        publishedAt: "2024-01-15",
-        category: "Technology", // ✅ already valid
-        likes: 124,
-        comments: 23,
-        readTime: "5 min read",
-        isLiked: true,
-        isBookmarked: false
-    },
-    {
-        id: "2",
-        title: "Building Better User Experiences with Design Systems",
-        excerpt: "Learn how to create and maintain design systems...",
-        content: "Full article content here...",
-        coverImage: blogHero2,
-        author: {
-            name: "Alex Thompson",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-            username: "alexthompson"
-        },
-        publishedAt: "2024-01-12",
-        category: "Design", // ✅ already valid
-        likes: 89,
-        comments: 15,
-        readTime: "7 min read",
-        isLiked: false,
-        isBookmarked: true
-    },
-    {
-        id: "3",
-        title: "Productivity Hacks for Remote Workers",
-        excerpt: "Discover proven strategies and tools...",
-        content: "Full article content here...",
-        coverImage: blogHero3,
-        author: {
-            name: "Maria Rodriguez",
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-            username: "mariarodriguez"
-        },
-        publishedAt: "2024-01-10",
-        category: "Personal", // ⬅️ Changed from "Productivity" to "Personal"
-        likes: 156,
-        comments: 31,
-        readTime: "4 min read",
-        isLiked: false,
-        isBookmarked: false
-    },
-    {
-        id: "4",
-        title: "The Art of Code Reviews: Best Practices for Teams",
-        excerpt: "Master the art of giving and receiving code reviews...",
-        content: "Full article content here...",
-        coverImage: blogHero1,
-        author: {
-            name: "David Kim",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-            username: "davidkim"
-        },
-        publishedAt: "2024-01-08",
-        category: "Technology", // ⬅️ Changed from "Development" to "Technology"
-        likes: 203,
-        comments: 45,
-        readTime: "6 min read",
-        isLiked: true,
-        isBookmarked: true
-    },
-    {
-        id: "5",
-        title: "Understanding Modern CSS: Grid, Flexbox, and Beyond",
-        excerpt: "Deep dive into modern CSS layout techniques...",
-        content: "Full article content here...",
-        coverImage: blogHero2,
-        author: {
-            name: "Emma Wilson",
-            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
-            username: "emmawilson"
-        },
-        publishedAt: "2024-01-05",
-        category: "Education", // ⬅️ Changed from "CSS" to "Education"
-        likes: 178,
-        comments: 28,
-        readTime: "8 min read",
-        isLiked: false,
-        isBookmarked: false
-    }
-];
+import { useGetAllBlogsQuery } from '@/redux/api/blogApiSlice';
 
 
 const blogCategories = [
@@ -138,8 +40,20 @@ function Home() {
     const [viewMode, setViewMode] = useState("card")
     const [selectedCategory, setSelectedCategory] = useState("All")
     const [sortBy, setSortBy] = useState("latest")
+    const [allBlogs, setAllBlogs] = useState([])
 
-    const filteredPosts = mockPosts.filter((blog) => {
+    const { data, isLoading } = useGetAllBlogsQuery({})
+
+    console.log(allBlogs);
+
+    useEffect(() => {
+        if (data?.data?.blogs) {
+            setAllBlogs(data.data.blogs);
+        }
+    }, [data]);
+
+
+    const filteredPosts = allBlogs.filter((blog) => {
         return selectedCategory === "All" || blog.category === selectedCategory
     })
 
@@ -152,6 +66,24 @@ function Home() {
             return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
         }
     })
+
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-[#020817] flex items-center justify-center text-white">
+                Loading blogs...
+            </div>
+        );
+    }
+
+
+    if (!sortedByBlogs.length) {
+        return (
+            <div className="min-h-screen bg-[#020817] flex items-center justify-center text-gray-400">
+                No blogs found.
+            </div>
+        );
+    }
 
     return (
         <div className='min-h-screen bg-[#020817]'>
@@ -216,11 +148,12 @@ function Home() {
                 }>
                     {sortedByBlogs.map((post, index) => (
                         <div
-                            key={post.id}
+                            key={post._id}
                             className="animate-fade-in"
                             style={{ animationDelay: `${index * 0.1}s` }}
                         >
                             <BlogCard post={post} variant={viewMode} />
+                            {/* {console.log(post, "post")} */}
                         </div>
                     ))}
                 </div>

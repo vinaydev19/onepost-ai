@@ -94,7 +94,7 @@ const getAllBlog = asyncHandler(async (req, res) => {
         .sort(sortOptions)
         .skip(skip)
         .limit(Number(limit))
-        .populate("author", "username email");
+        .populate("author", "username email profilePic");
 
     const totalBlogs = await Blog.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalBlogs / limit);

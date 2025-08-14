@@ -1,12 +1,14 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { persistStore, persistReducer, 
-  FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER 
+import {
+  persistStore, persistReducer,
+  FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 import { apiSlice } from './api/apiSlice';
 import userSlice from './features/userSlice';
+import blogSlice from './features/blogSlice';
 
 const persistConfig = {
   key: 'OnePostAI',
@@ -18,6 +20,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   user: userSlice,
+  blog: blogSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
