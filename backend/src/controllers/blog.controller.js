@@ -478,14 +478,6 @@ const deleteBlog = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "Blog deleted successfully"));
 });
 
-const getMyBlogs = asyncHandler(async (req, res) => {
-    const blogs = await Blog.find({ author: req.user._id }).sort({ createdAt: -1 });
-
-
-
-    return res.status(200).json(new ApiResponse(200, { blogs }, "Your blogs"));
-});
-
 const updateBlogStatus = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const { status } = req.body;
@@ -517,6 +509,5 @@ export {
     getAllBlogByAuthor,
     updateBlog,
     deleteBlog,
-    getMyBlogs,
     updateBlogStatus,
 }

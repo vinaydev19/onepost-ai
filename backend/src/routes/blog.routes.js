@@ -6,7 +6,6 @@ import {
     getAllBlogByAuthor,
     updateBlog,
     deleteBlog,
-    getMyBlogs,
     updateBlogStatus,
 } from "../controllers/blog.controller.js";
 import { verifyJWT } from '../middlewares/auth.middleware.js';
@@ -38,7 +37,6 @@ router.delete('/delete-blog/:id', verifyJWT, deleteBlog);
 
 // Optionally use these if needed
 router.get('/author-blogs/:username', getAllBlogByAuthor);
-router.get('/my-blogs', verifyJWT, getMyBlogs);
 router.patch('/update-blog-status/:id', verifyJWT, updateBlogStatus);
 
 
