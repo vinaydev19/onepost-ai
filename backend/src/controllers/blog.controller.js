@@ -90,6 +90,7 @@ const getAllBlog = asyncHandler(async (req, res) => {
     const sortOptions = {};
     sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
 
+    console.log("id:", req.user?._id);
 
     const blogs = await Blog.aggregate([
         {
@@ -143,6 +144,40 @@ const getAllBlog = asyncHandler(async (req, res) => {
                                 }
                             ]
                         }
+                    },
+                    {
+                        $unwind: "$commentedByUser"
+                    },
+                    {
+                        $lookup: {
+                            from: "likes", // Assuming likes is the collection name for likes
+                            localField: "_id", // Local field in the Comments collection - current comment id
+                            foreignField: "comment", // Foreign field in the Likes collection - match comment id === this current comment id
+                            as: "likes" // Name of the field to add in the output documents
+                        }
+                    },
+                    {
+                        $addFields: {
+                            likesCount: { $size: "$likes" },
+                            isLiked: {
+                                $cond: {
+                                    if: { $in: [{ $toObjectId: req.user?._id }, "$likes.likedBy"] },
+                                    then: true,
+                                    else: false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            content: 1,
+                            commentedBy: 1,
+                            commentedByUser: 1,
+                            createdAt: 1,
+                            likesCount: 1,
+                            isLiked: 1
+                        }
                     }
                 ]
             }
@@ -153,7 +188,14 @@ const getAllBlog = asyncHandler(async (req, res) => {
                 commentsCount: { $size: "$comments" }, // Count of comments
                 isLiked: {
                     $cond: {
-                        if: { $in: [req.user?._id, "$likes.likedBy"] }, // Check if the user has liked the blog
+                        if: { $in: [{ $toObjectId: req.user?._id }, "$likes.likedBy"] }, // Check if the user has liked the blog
+                        then: true,
+                        else: false
+                    }
+                },
+                canEdit: {
+                    $cond: {
+                        if: { $eq: [req.user?._id, "$author._id"] }, // Check if the current user is the author of the blog
                         then: true,
                         else: false
                     }
@@ -174,11 +216,14 @@ const getAllBlog = asyncHandler(async (req, res) => {
                 likesCount: 1,
                 commentsCount: 1,
                 isLiked: 1,
+                canEdit: 1,
                 comments: {
                     _id: 1,
                     content: 1,
                     commentedBy: 1,
                     commentedByUser: 1,
+                    likesCount: 1,
+                    isLiked: 1,
                     createdAt: 1
                 },
                 createdAt: 1,
@@ -249,6 +294,40 @@ const getOneBlog = asyncHandler(async (req, res) => {
                                 }
                             ]
                         }
+                    },
+                    {
+                        $unwind: "$commentedByUser"
+                    },
+                    {
+                        $lookup: {
+                            from: "likes", // Assuming likes is the collection name for likes
+                            localField: "_id", // Local field in the Comments collection - current comment id
+                            foreignField: "comment", // Foreign field in the Likes collection - match comment id === this current comment id
+                            as: "likes" // Name of the field to add in the output documents
+                        }
+                    },
+                    {
+                        $addFields: {
+                            likesCount: { $size: "$likes" },
+                            isLiked: {
+                                $cond: {
+                                    if: { $in: [{ $toObjectId: req.user?._id }, "$likes.likedBy"] },
+                                    then: true,
+                                    else: false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            content: 1,
+                            commentedBy: 1,
+                            commentedByUser: 1,
+                            createdAt: 1,
+                            likesCount: 1,
+                            isLiked: 1
+                        }
                     }
                 ]
             }
@@ -260,6 +339,13 @@ const getOneBlog = asyncHandler(async (req, res) => {
                 isLiked: {
                     $cond: {
                         if: { $in: [req.user?._id, "$likes.likedBy"] }, // Check if the user has liked the blog
+                        then: true,
+                        else: false
+                    }
+                },
+                canEdit: {
+                    $cond: {
+                        if: { $eq: [req.user?._id, "$author._id"] }, // Check if the current user is the author of the blog
                         then: true,
                         else: false
                     }
@@ -280,11 +366,14 @@ const getOneBlog = asyncHandler(async (req, res) => {
                 likesCount: 1,
                 commentsCount: 1,
                 isLiked: 1,
+                canEdit: 1,
                 comments: {
                     _id: 1,
                     content: 1,
                     commentedBy: 1,
                     commentedByUser: 1,
+                    likesCount: 1,
+                    isLiked: 1,
                     createdAt: 1
                 },
                 createdAt: 1,
@@ -391,6 +480,8 @@ const deleteBlog = asyncHandler(async (req, res) => {
 
 const getMyBlogs = asyncHandler(async (req, res) => {
     const blogs = await Blog.find({ author: req.user._id }).sort({ createdAt: -1 });
+
+
 
     return res.status(200).json(new ApiResponse(200, { blogs }, "Your blogs"));
 });
