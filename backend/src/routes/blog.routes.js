@@ -11,6 +11,7 @@ import {
 } from "../controllers/blog.controller.js";
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
+import { optionalVerifyJWT } from '../middlewares/optionalVerifyJWT.middleware.js';
 
 const router = Router();
 
@@ -21,10 +22,10 @@ router.post('/create-blog', verifyJWT, upload.fields([
 ]), createBlog);
 
 // Get all blogs
-router.get('/get-blogs', getAllBlog);
+router.get('/get-blogs', optionalVerifyJWT, getAllBlog);
 
 // Get a single blog by ID
-router.get('/get-blog/:slug', getOneBlog);
+router.get('/get-blog/:slug', optionalVerifyJWT, getOneBlog);
 
 // Update a blog by ID
 router.put('/update-blog/:id', verifyJWT, upload.fields([
