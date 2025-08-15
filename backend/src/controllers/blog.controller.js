@@ -90,11 +90,102 @@ const getAllBlog = asyncHandler(async (req, res) => {
     const sortOptions = {};
     sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
 
-    const blogs = await Blog.find(searchQuery)
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(Number(limit))
-        .populate("author", "username email profilePic");
+
+    const blogs = await Blog.aggregate([
+        {
+            $match: searchQuery
+        },
+        {
+            $sort: sortOptions
+        },
+        {
+            $skip: Number(skip)
+        },
+        {
+            $limit: Number(limit)
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        },
+        { $unwind: "$author" },
+        {
+            $lookup: {
+                from: "likes", // Assuming likes is the collection name for likes
+                localField: "_id", // Local field in the Blog collection -  current blogs id
+                foreignField: "Blog", // Foreign field in the Likes collection - match blog id === this current blog id
+                as: "likes" // Name of the field to add in the output documents
+            }
+        },
+        {
+            $lookup: {
+                from: "comments", // Assuming comments is the collection name for comments
+                localField: "_id", // Local field in the Blog collection - current blogs id
+                foreignField: "Blog",  // Foreign field in the Comments collection - match blog id === this current blog id
+                as: "comments", // Name of the field to add in the output documents
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users", // Assuming users is the collection name for users
+                            localField: "commentedBy", // Local field in the Comments collection - commentedBy field
+                            foreignField: "_id", // Foreign field in the Users collection - match user id === commentedBy id
+                            as: "commentedByUser", // Name of the field to add in the output documents
+                            pipeline: [
+                                {
+                                    $project: {
+                                        username: 1,
+                                        profilePic: 1
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                likesCount: { $size: "$likes" }, // Count of likes
+                commentsCount: { $size: "$comments" }, // Count of comments
+                isLiked: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$likes.likedBy"] }, // Check if the user has liked the blog
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                author: 1,
+                title: 1,
+                slug: 1,
+                content: 1,
+                featuredImage: 1,
+                files: 1,
+                status: 1,
+                category: 1,
+                tags: 1,
+                likesCount: 1,
+                commentsCount: 1,
+                isLiked: 1,
+                comments: {
+                    _id: 1,
+                    content: 1,
+                    commentedBy: 1,
+                    commentedByUser: 1,
+                    createdAt: 1
+                },
+                createdAt: 1,
+                updatedAt: 1
+            }
+        }
+    ])
 
     const totalBlogs = await Blog.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalBlogs / limit);
@@ -115,7 +206,92 @@ const getOneBlog = asyncHandler(async (req, res) => {
         throw new ApiError(400, "slug is required")
     }
 
-    const oneBlog = await Blog.findOne({ slug })
+    const oneBlog = await Blog.aggregate([
+        {
+            $match: { slug: slug }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        },
+        { $unwind: "$author" },
+        {
+            $lookup: {
+                from: "likes", // Assuming likes is the collection name for likes
+                localField: "_id", // Local field in the Blog collection -  current blogs id
+                foreignField: "Blog", // Foreign field in the Likes collection - match blog id === this current blog id
+                as: "likes" // Name of the field to add in the output documents
+            }
+        },
+        {
+            $lookup: {
+                from: "comments", // Assuming comments is the collection name for comments
+                localField: "_id", // Local field in the Blog collection - current blogs id
+                foreignField: "Blog",  // Foreign field in the Comments collection - match blog id === this current blog id
+                as: "comments", // Name of the field to add in the output documents
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users", // Assuming users is the collection name for users
+                            localField: "commentedBy", // Local field in the Comments collection - commentedBy field
+                            foreignField: "_id", // Foreign field in the Users collection - match user id === commentedBy id
+                            as: "commentedByUser", // Name of the field to add in the output documents
+                            pipeline: [
+                                {
+                                    $project: {
+                                        username: 1,
+                                        profilePic: 1
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                likesCount: { $size: "$likes" }, // Count of likes
+                commentsCount: { $size: "$comments" }, // Count of comments
+                isLiked: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$likes.likedBy"] }, // Check if the user has liked the blog
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                author: 1,
+                title: 1,
+                slug: 1,
+                content: 1,
+                featuredImage: 1,
+                files: 1,
+                status: 1,
+                category: 1,
+                tags: 1,
+                likesCount: 1,
+                commentsCount: 1,
+                isLiked: 1,
+                comments: {
+                    _id: 1,
+                    content: 1,
+                    commentedBy: 1,
+                    commentedByUser: 1,
+                    createdAt: 1
+                },
+                createdAt: 1,
+                updatedAt: 1
+            }
+        }
+    ])
 
     if (!oneBlog) {
         throw new ApiError(404, "blog not found")
