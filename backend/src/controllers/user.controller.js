@@ -521,7 +521,7 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
             $lookup: {
                 from: "follows",
                 localField: "_id",
-                foreignField: "followers",
+                foreignField: "followerId",
                 as: "followers"
             }
         },
@@ -529,7 +529,7 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
             $lookup: {
                 from: "follows",
                 localField: "_id",
-                foreignField: "following",
+                foreignField: "followingId",
                 as: "following"
             }
         },
