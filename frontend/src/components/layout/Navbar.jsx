@@ -7,6 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { LogOut, Menu, Search, Settings, User, X } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useSelector } from 'react-redux';
+import { useLogoutMutation } from '@/redux/api/userApiSlice';
+import { getUser } from '@/redux/features/userSlice';
+import toast from 'react-hot-toast';
 
 function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -30,11 +33,22 @@ function Navbar() {
         email: "john@example.com"
     };
 
-
-    console.log(user);
-
-
     const isAuthenticated = useSelector((state) => state.user.user);
+
+    const [logoutApi] = useLogoutMutation()
+
+    const handleSignOut = async () => {
+        try {
+            await logoutApi().unwrap(); 
+            dispatch(getUser(null));
+            toast.success(res.message)
+            navigate("/login");
+        } catch (error) {
+            console.log(`something want wrong while logout`);
+            console.log(error);
+            toast.error(error.data.message)
+        }
+    };
 
 
     return (
@@ -120,7 +134,9 @@ function Navbar() {
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="text-destructive hover:bg-gray-800 cursor-pointer">
+                                        <DropdownMenuItem
+                                            onClick={handleSignOut}
+                                            className="text-destructive hover:bg-gray-800 cursor-pointer">
                                             <LogOut className="mr-2 h-4 w-4 " />
                                             Sign out
                                         </DropdownMenuItem>
@@ -175,8 +191,12 @@ function Navbar() {
                                     <Link to="/write-new-blog" className="block py-2 cursor-pointer text-sm font-medium">Write</Link>
                                     <Link to="/profile" className="block py-2 cursor-pointer text-sm font-medium">Profile</Link>
                                     <Link to="/settings" className="block py-2 cursor-pointer text-sm font-medium">Settings</Link>
-                                    <button className="block py-2 text-sm font-medium cursor-pointer text-destructive text-left">Sign Out</button>
-                                </>
+                                    <button
+                                        onClick={handleSignOut}
+                                        className="block py-2 text-sm font-medium cursor-pointer text-destructive text-left"
+                                    >
+                                        Sign Out
+                                    </button>                                </>
                             ) : (
                                 <>
                                     <Link to="/login" className="block py-2 cursor-pointer text-sm font-medium">Sign In</Link>

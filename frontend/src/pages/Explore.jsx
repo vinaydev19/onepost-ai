@@ -3,111 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
-import blogHero1 from "../assets/Logo.png";
-import blogHero2 from "../assets/Logo.png";
-import blogHero3 from "../assets/Logo.png";
 import { useGetAllBlogsQuery } from '@/redux/api/blogApiSlice';
-
-
-
-const mockPosts = [
-  {
-    id: "1",
-    title: "The Future of Web Development: Trends to Watch in 2024",
-    excerpt: "Explore the latest trends shaping the future of web development...",
-    content: "Full article content here...",
-    coverImage: blogHero1,
-    author: {
-      name: "Sarah Chen",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-      username: "sarahchen"
-    },
-    publishedAt: "2024-01-15",
-    category: "Technology", // ✅ already valid
-    likes: 124,
-    comments: 23,
-    readTime: "5 min read",
-    isLiked: true,
-    isBookmarked: false
-  },
-  {
-    id: "2",
-    title: "Building Better User Experiences with Design Systems",
-    excerpt: "Learn how to create and maintain design systems...",
-    content: "Full article content here...",
-    coverImage: blogHero2,
-    author: {
-      name: "Alex Thompson",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      username: "alexthompson"
-    },
-    publishedAt: "2024-01-12",
-    category: "Design", // ✅ already valid
-    likes: 89,
-    comments: 15,
-    readTime: "7 min read",
-    isLiked: false,
-    isBookmarked: true
-  },
-  {
-    id: "3",
-    title: "Productivity Hacks for Remote Workers",
-    excerpt: "Discover proven strategies and tools...",
-    content: "Full article content here...",
-    coverImage: blogHero3,
-    author: {
-      name: "Maria Rodriguez",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      username: "mariarodriguez"
-    },
-    publishedAt: "2024-01-10",
-    category: "Personal", // ⬅️ Changed from "Productivity" to "Personal"
-    likes: 156,
-    comments: 31,
-    readTime: "4 min read",
-    isLiked: false,
-    isBookmarked: false
-  },
-  {
-    id: "4",
-    title: "The Art of Code Reviews: Best Practices for Teams",
-    excerpt: "Master the art of giving and receiving code reviews...",
-    content: "Full article content here...",
-    coverImage: blogHero1,
-    author: {
-      name: "David Kim",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      username: "davidkim"
-    },
-    publishedAt: "2024-01-08",
-    category: "Technology", // ⬅️ Changed from "Development" to "Technology"
-    likes: 203,
-    comments: 45,
-    readTime: "6 min read",
-    isLiked: true,
-    isBookmarked: true
-  },
-  {
-    id: "5",
-    title: "Understanding Modern CSS: Grid, Flexbox, and Beyond",
-    excerpt: "Deep dive into modern CSS layout techniques...",
-    content: "Full article content here...",
-    coverImage: blogHero2,
-    author: {
-      name: "Emma Wilson",
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
-      username: "emmawilson"
-    },
-    publishedAt: "2024-01-05",
-    category: "Education", // ⬅️ Changed from "CSS" to "Education"
-    likes: 178,
-    comments: 28,
-    readTime: "8 min read",
-    isLiked: false,
-    isBookmarked: false
-  }
-];
-
 
 const blogCategories = [
   "All",
@@ -142,14 +38,15 @@ function Explore() {
 
   const { data, isLoading } = useGetAllBlogsQuery({})
 
-  console.log(allBlogs);
-
   useEffect(() => {
     if (data?.data?.blogs) {
       setAllBlogs(data.data.blogs);
     }
   }, [data]);
 
+  const filteredPosts = allBlogs.filter((blog) => {
+    return selectedCategory === "All" || blog.category === selectedCategory
+})
 
 
   if (isLoading) {
@@ -209,7 +106,7 @@ function Explore() {
         <div className="flex items-center gap-2 mb-6">
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {allBlogs.map((blog) => (
+          {filteredPosts.map((blog) => (
             <BlogCard key={`trending-${blog._id}`} post={blog} />
           ))}
         </div>

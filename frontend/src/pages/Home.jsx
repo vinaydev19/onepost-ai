@@ -1,14 +1,10 @@
 import { Button } from '@/components/ui/button';
-import React, { use, useEffect, useState } from 'react'
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useEffect, useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-import blogHero1 from "../assets/Logo.png";
-import blogHero2 from "../assets/Logo.png";
-import blogHero3 from "../assets/Logo.png";
 import { Filter, Grid, List } from 'lucide-react';
 import BlogCard from '@/components/common/BlogCard';
 import { useGetAllBlogsQuery } from '@/redux/api/blogApiSlice';
+import { all } from 'axios';
 
 
 const blogCategories = [
@@ -44,7 +40,8 @@ function Home() {
 
     const { data, isLoading } = useGetAllBlogsQuery({})
 
-    console.log(allBlogs);
+    console.log(allBlogs, "allBlogs");
+    
 
     useEffect(() => {
         if (data?.data?.blogs) {
@@ -57,30 +54,10 @@ function Home() {
         return selectedCategory === "All" || blog.category === selectedCategory
     })
 
-    const sortedByBlogs = [...filteredPosts].sort((a, b) => {
-        if (sortBy === "popular") {
-            return b.likes - a.likes
-        } else if (sortBy === "comments") {
-            return b.comments - a.comments
-        } else {
-            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-        }
-    })
-
-
     if (isLoading) {
         return (
             <div className="min-h-screen bg-[#020817] flex items-center justify-center text-white">
                 Loading blogs...
-            </div>
-        );
-    }
-
-
-    if (!sortedByBlogs.length) {
-        return (
-            <div className="min-h-screen bg-[#020817] flex items-center justify-center text-gray-400">
-                No blogs found.
             </div>
         );
     }
@@ -146,7 +123,7 @@ function Home() {
                         ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         : "max-w-4xl mx-auto"
                 }>
-                    {sortedByBlogs.map((post, index) => (
+                    {filteredPosts.map((post, index) => (
                         <div
                             key={post._id}
                             className="animate-fade-in"

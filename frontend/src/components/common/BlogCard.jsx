@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Bookmark, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageCircle, Bookmark, MoreHorizontal } from 'lucide-react';
 
 function BlogCard({ post, variant = "card", showImage = true }) {
     const formatDate = (dateString) => {
@@ -16,16 +16,13 @@ function BlogCard({ post, variant = "card", showImage = true }) {
         });
     };
 
-    // console.log(post);
-    
-
     if (variant === "list") {
         return (
             <Card className="mb-6 overflow-hidden text-white hover:shadow-hover transition-all duration-300 border-[0.5px] border-gray-800">
                 <CardContent className="p-6">
                     <div className="flex gap-6">
                         {showImage && (
-                            <Link to={`/blog/${post?.id}`} className="flex-shrink-0">
+                            <Link to={`/blog/${post?.slug}`} className="flex-shrink-0">
                                 <img
                                     src={post?.featuredImage}
                                     alt={post?.title}
@@ -54,7 +51,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                                 </h3>
                             </Link>
 
-                            {/* <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <Button
                                         variant="ghost"
@@ -62,7 +59,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                                         className={`h-8 px-3 text-gray-400 hover:cursor-pointer hover:text-red-500 hover:bg-[#1e293b] ${post?.isLiked ? "text-red-500" : ""}`}
                                     >
                                         <Heart className={`h-4 w-4 mr-1 ${post?.isLiked ? "fill-current" : ""}`} />
-                                        {post?.likes}
+                                        {post?.likesCount}
                                     </Button>
 
                                     <Button
@@ -71,27 +68,24 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                                         className="h-8 px-3 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer"
                                     >
                                         <MessageCircle className="h-4 w-4 mr-1" />
-                                        {post?.comments}
                                     </Button>
-
-                                    <span className="text-xs text-gray-400">{post?.readTime}</span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <Button
+                                    {/* <Button
                                         variant="ghost"
                                         size="icon"
                                         className={`h-8 w-8 text-gray-400 hover:text-white hover:cursor-pointer hover:bg-[#1e293b] ${post?.isBookmarked ? "text-primary" : ""}`}
 
                                     >
                                         <Bookmark className={`h-4 w-4 ${post?.isBookmarked ? "fill-current" : ""}`} />
-                                    </Button>
+                                    </Button> */}
 
                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer hover:text-white">
                                         <MoreHorizontal className="h-4 w-4" />
                                     </Button>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                 </CardContent>
@@ -103,7 +97,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
         <Card className="mb-6 overflow-hidden text-white hover:shadow-hover transition-all duration-300 border-[0.5px] border-gray-800">
             {showImage && (
                 <div className="relative overflow-hidden">
-                    <Link to={`/blog/${post?._id}`}>
+                    <Link to={`/blog/${post?.slug}`}>
                         <img
                             src={post?.featuredImage}
                             alt={post?.title}
@@ -136,7 +130,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                     </h3>
                 </Link>
 
-                {/* <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-4">
                         <Button
                             variant="ghost"
@@ -144,8 +138,8 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                             className={`h-8 px-3 text-gray-400 hover:cursor-pointer hover:text-red-500 hover:bg-[#1e293b] ${post?.isLiked ? "text-red-500" : ""}`}
 
                         >
-                            <Heart className={`h-4 w-4 mr-1 ${post?.isLiked ? "fill-current" : ""}`} />
-                            {post?.likes}
+                            <Heart className={`h-4 w-4 mr-1 ${post?.isLiked ? "bg-red-500" : ""}`} />
+                            {post?.likesCount}
                         </Button>
 
                         <Button
@@ -154,27 +148,26 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                             className="h-8 px-3 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer"
                         >
                             <MessageCircle className="h-4 w-4 mr-1" />
-                            {post?.comments}
                         </Button>
 
                         <span className="text-xs text-gray-400">{post?.readTime}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button
+                        {/* <Button
                             variant="ghost"
                             size="icon"
                             className={`h-8 w-8 text-gray-400 hover:text-white hover:cursor-pointer hover:bg-[#1e293b] ${post?.isBookmarked ? "text-primary" : ""}`}
 
                         >
                             <Bookmark className={`h-4 w-4 ${post?.isBookmarked ? "fill-current" : ""}`} />
-                        </Button>
+                        </Button> */}
 
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer hover:text-white">
                             <MoreHorizontal className="h-4 w-4" />
                         </Button>
                     </div>
-                </div> */}
+                </div>
             </CardContent>
         </Card>
     );
