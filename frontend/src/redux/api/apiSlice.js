@@ -3,7 +3,8 @@ import { BASE_URL } from "../constants.js"
 
 export const apiSlice = createApi({
     baseQuery: fetchBaseQuery({
-        baseUrl: BASE_URL
+        baseUrl: BASE_URL,
+        credentials: "include",
     }),
     tagTypes: ["Users", "Blogs"],
     endpoints: (builder) => ({}),

@@ -28,7 +28,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
             async onQueryStarted(params, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    dispatch(getUser(data.data.loggedUser))
+                    dispatch(getUser(data.data.user))
                 } catch (error) {
                     console.log(`error while login ${error}`);
                 }
