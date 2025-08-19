@@ -35,11 +35,14 @@ function Navbar() {
 
     const isAuthenticated = useSelector((state) => state.user.user);
 
+    console.log(isAuthenticated.username);
+    
+
     const [logoutApi] = useLogoutMutation()
 
     const handleSignOut = async () => {
         try {
-            await logoutApi().unwrap(); 
+            await logoutApi().unwrap();
             dispatch(getUser(null));
             toast.success(res.message)
             navigate("/login");
@@ -122,7 +125,7 @@ function Navbar() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="w-56 bg-[#020817] text-white" align="end">
                                         <DropdownMenuItem asChild>
-                                            <Link to="/profile" className="flex cursor-pointer hover:bg-gray-800 items-center">
+                                            <Link to={`/profile/${isAuthenticated.username}`} className="flex cursor-pointer hover:bg-gray-800 items-center">
                                                 <User className="mr-2 h-4 w-4" />
                                                 Profile
                                             </Link>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,59 +9,64 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Edit, UserPlus, MessageCircle, Camera } from "lucide-react";
 import { useSelector } from "react-redux";
-
-// Mock user data
-const mockProfileUser = {
-  fullName: "Sarah Chen",
-  username: "sarahchen",
-  email: "sarah.chen@example.com",
-  profilePic: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face",
-  bio: "Full-stack developer passionate about modern web technologies and user experience. Currently building tools that help developers create better applications.",
-  joinedDate: "2023-01-15",
-  followers: 1247,
-  following: 156,
-  isFollowing: false,
-  isOwnProfile: false
-};
-
-const mockCurrentUser = {
-  fullName: "John Doe",
-  username: "johndoe",
-  email: "john@example.com",
-  profilePic: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face"
-};
+import { useGetUserProfileQuery } from "@/redux/api/userApiSlice";
 
 export default function Profile() {
   const { username } = useParams();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: mockProfileUser.fullName,
-    username: mockProfileUser.username,
-    bio: mockProfileUser.bio
+    fullName: "",
+    username: "",
+    bio: ""
   });
+  const [profileUser, setProfileUser] = useState(null);
 
-  const profileUser = mockProfileUser;
-  const isOwnProfile = !username || username === mockCurrentUser.fullName.toLowerCase().replace(" ", "");
+  const currentUser = useSelector((state) => state.user.user);
+
+  const { data, error, isLoading } = useGetUserProfileQuery(username);
+
+  // sync API data into local state
+  useEffect(() => {
+    if (data) {
+      setProfileUser({
+        fullName: data?.data.fullName,
+        username: data?.data.username,
+        email: data?.data.email,
+        profilePic: data?.data.profilePic,
+        bio: data?.data.bio || "No bio yet.",
+        joinedDate: data?.data.createdAt,
+        followers: data?.data.followersCount,
+        following: data?.data.followingCount,
+        isFollowing: data?.data.isFollowing,
+        isOwnProfile: username === currentUser?.username
+      });
+
+      setFormData({
+        fullName: data?.data.fullName,
+        username: data?.data.username,
+        bio: data?.data.bio || ""
+      });
+    }
+  }, [data, username, currentUser]);
+
+  console.log("data", data?.data.fullName);
+  console.log("profile", profileUser);
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
 
-  const profile = useSelector((state) => state.user.profile)
-
-  console.log(profile);
-
-
-  const handleEditProfile = () => {
-    setIsEditDialogOpen(true);
-  };
+  const handleEditProfile = () => setIsEditDialogOpen(true);
 
   const handleEditProfilePic = () => {
+    // handle upload later
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+    // update API call goes here
     setIsEditDialogOpen(false);
   };
 
@@ -73,19 +78,33 @@ export default function Profile() {
     }));
   };
 
+  if (isLoading) {
+    return <div className="text-center text-white">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">Error loading profile</div>;
+  }
+
+  if (!profileUser) {
+    return null; // or skeleton UI
+  }
+
   return (
     <div className="min-h-screen bg-[#020817] text-white">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto mb-8">
           <Card className="overflow-hidden">
             <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row gap-6  items-start">
+              <div className="flex flex-col md:flex-row gap-6 items-start">
                 <div className="relative border border-[#1e293b] bg-[#0f172a] rounded-full">
                   <Avatar className="h-24 w-24 md:h-32 md:w-32">
                     <AvatarImage src={profileUser.profilePic} alt={profileUser.fullName} />
-                    <AvatarFallback className="text-2xl">{profileUser.fullName[0]}</AvatarFallback>
+                    <AvatarFallback className="text-2xl">
+                      {profileUser.fullName?.[0] || "?"}
+                    </AvatarFallback>
                   </Avatar>
-                  {isOwnProfile && (
+                  {profileUser.isOwnProfile && (
                     <Button
                       size="icon"
                       variant="secondary"
@@ -106,7 +125,7 @@ export default function Profile() {
                     </div>
 
                     <div className="flex gap-2 mt-4 md:mt-0">
-                      {isOwnProfile ? (
+                      {profileUser.isOwnProfile ? (
                         <Button variant="outline" className="gap-2" onClick={handleEditProfile}>
                           <Edit className="h-4 w-4" />
                           Edit Profile
@@ -115,7 +134,7 @@ export default function Profile() {
                         <>
                           <Button
                             variant={profileUser.isFollowing ? "secondary" : "default"}
-                            className="gap-2"
+                            className="gap-2 bg-[#6c46e2]"
                           >
                             <UserPlus className="h-4 w-4" />
                             {profileUser.isFollowing ? "Following" : "Follow"}
@@ -203,7 +222,12 @@ export default function Profile() {
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105">Save Changes</Button>
+              <Button
+                type="submit"
+                className="bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105"
+              >
+                Save Changes
+              </Button>
             </div>
           </form>
         </DialogContent>

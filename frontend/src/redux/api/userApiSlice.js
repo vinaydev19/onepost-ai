@@ -131,14 +131,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
             query: (username) => ({
                 url: `${USERS_URL}/profile/${username}`
             }),
-            async onQueryStarted(params, { dispatch, queryFulfilled }) {
-                try {
-                    const { data } = await queryFulfilled
-                    dispatch(getMyProfile(data))
-                } catch (error) {
-                    console.log(`error while fetch profile ${error}`);
-                }
-            }
         }),
     })
 })
@@ -157,5 +149,6 @@ export const {
     usePasswordChangeMutation,
     useEmailChangeMutation,
     useEmailConfirmMutation,
-    useGetCurrentUserQuery
+    useGetCurrentUserQuery,
+    useGetUserProfileQuery
 } = userApiSlice

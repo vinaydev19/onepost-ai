@@ -521,7 +521,7 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
     }
 
 
-    const follow = await User.aggregate([
+    const user = await User.aggregate([
         {
             $match: {
                 username: username?.toLowerCase()
@@ -577,13 +577,11 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
         }
     ])
 
-    if (!follow?.length) {
-        throw new ApiError(400, "follow does not exist")
+    if (!user?.length) {
+        throw new ApiError(400, "user does not exist")
     }
 
-    return res.status(200).json(new ApiResponse(200, follow[0], "user follow fetched succesfully"))
-
-
+    return res.status(200).json(new ApiResponse(200, user[0], "user fetched succesfully"))
 })
 
 const getReadingHistory = asyncHandler(async (req, res) => {

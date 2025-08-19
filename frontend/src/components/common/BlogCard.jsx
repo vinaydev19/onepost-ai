@@ -138,7 +138,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                             className={`h-8 px-3 text-gray-400 hover:cursor-pointer hover:text-red-500 hover:bg-[#1e293b] ${post?.isLiked ? "text-red-500" : ""}`}
 
                         >
-                            <Heart className={`h-4 w-4 mr-1 ${post?.isLiked ? "bg-red-500" : ""}`} />
+                            <Heart className={`h-4 w-4 mr-1 ${post?.isLiked ? "fill-current" : ""}`} />
                             {post?.likesCount}
                         </Button>
 

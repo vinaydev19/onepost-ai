@@ -15,6 +15,7 @@ import PasswordReset from './PasswordReset'
 import PasswordChange from './PasswordChange'
 import EmailChange from './EmailChange'
 import Editor from './Editor'
+import BlogPost from './BlogPost'
 
 function Body() {
     const router = createBrowserRouter(
@@ -31,8 +32,9 @@ function Body() {
                 <Route path='' element={<ProtectedRoute />}>
                     <Route element={<MainLayout />}>
                         <Route path='' element={<Home />} />
-                        <Route path='profile' element={<Profile />} />
+                        <Route path='profile/:username' element={<Profile />} />
                         <Route path='explore' element={<Explore />} />
+                        <Route path='blog/:slug' element={<BlogPost />} />
                         <Route path='reading-lists' element={<ReadingLists />} />
                         <Route path='write-new-blog' element={<Editor />} />
                     </Route>
