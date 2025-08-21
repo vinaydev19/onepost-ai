@@ -12,6 +12,8 @@ import { Mongoose } from "mongoose"
 const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "strict",
+    path: "/",
 };
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -174,9 +176,6 @@ const userLogin = asyncHandler(async (req, res) => {
 
 const userLogout = asyncHandler(async (req, resp) => {
 
-    console.log(req.user._id);
-
-
     await User.findByIdAndUpdate(
         req.user._id,
         { $unset: { refreshToken: 1 } },
@@ -326,8 +325,6 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const updateUserProfilePic = asyncHandler(async (req, res) => {
     const profilePicLocalPath = req.file?.path;
-    console.log("profilePicLocalPath", req.file);
-
 
     if (!profilePicLocalPath) {
         throw new ApiResponse(400, "profilePic file missing");

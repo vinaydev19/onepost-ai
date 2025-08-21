@@ -39,10 +39,7 @@ function Home() {
     const [allBlogs, setAllBlogs] = useState([])
 
     const { data, isLoading } = useGetAllBlogsQuery({})
-
-    console.log(allBlogs, "allBlogs");
     
-
     useEffect(() => {
         if (data?.data?.blogs) {
             setAllBlogs(data.data.blogs);

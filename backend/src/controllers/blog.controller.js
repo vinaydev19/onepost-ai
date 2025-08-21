@@ -8,9 +8,6 @@ import { User } from "../models/user.model.js"
 const createBlog = asyncHandler(async (req, res) => {
     const { title, content, status, category, tags } = req.body
 
-    console.log([title, content, status]);
-
-
     if ([title, content, status, category, tags].some((field) => !field || field.trim() === "")) {
         throw new ApiError(400, "all field are required")
     }
@@ -90,7 +87,6 @@ const getAllBlog = asyncHandler(async (req, res) => {
     const sortOptions = {};
     sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
 
-    console.log("id:", req.user?._id);
 
     const blogs = await Blog.aggregate([
         {

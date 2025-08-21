@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Edit, UserPlus, MessageCircle, Camera } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useGetUserProfileQuery } from "@/redux/api/userApiSlice";
+import { useAccountUpdateMutation, useGetUserProfileQuery, useProfilePictureMutation } from "@/redux/api/userApiSlice";
+import toast from "react-hot-toast";
+import { LoaderTwo } from "@/components/ui/loader";
 
 export default function Profile() {
   const { username } = useParams();
@@ -20,12 +22,19 @@ export default function Profile() {
     bio: ""
   });
   const [profileUser, setProfileUser] = useState(null);
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const currentUser = useSelector((state) => state.user.user);
 
   const { data, error, isLoading } = useGetUserProfileQuery(username);
 
-  // sync API data into local state
+  const handleEditProfile = () => setIsEditDialogOpen(true);
+  const [accountUpdate, { isLoadingAsAccountUpdate }] = useAccountUpdateMutation()
+  const [profilePicture] = useProfilePictureMutation();
+
+
+
   useEffect(() => {
     if (data) {
       setProfileUser({
@@ -49,24 +58,52 @@ export default function Profile() {
     }
   }, [data, username, currentUser]);
 
-  console.log("data", data?.data.fullName);
-  console.log("profile", profileUser);
-
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
 
-  const handleEditProfile = () => setIsEditDialogOpen(true);
 
-  const handleEditProfilePic = () => {
-    // handle upload later
+
+
+  const handleEditProfilePic = async (e) => {
+    e.preventDefault();
+    fileInputRef.current.click();
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("profilePic", file);
+
+    try {
+      const res = await profilePicture(formData).unwrap();
+      toast.success(res.message || "Profile picture updated");
+    } catch (error) {
+      console.log("Error while updating profile picture", error);
+      toast.error(error.data?.message || "Failed to update profile picture");
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    // update API call goes here
+
+    try {
+      const res = await accountUpdate(formData).unwrap()
+      toast.success(res.message)
+      console.log(res);
+      if (res?.data?.user?.username && res.data.user.username !== username) {
+        navigate(`/profile/${res.data.username}`, { replace: true });
+      }
+
+    } catch (error) {
+      console.log(`something want wrong while account update`);
+      console.log(error);
+      toast.error(error.data.message)
+    }
+
     setIsEditDialogOpen(false);
   };
 
@@ -105,14 +142,25 @@ export default function Profile() {
                     </AvatarFallback>
                   </Avatar>
                   {profileUser.isOwnProfile && (
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="absolute -bottom-0 bg-[#122759] cursor-pointer -right-0 h-8 w-8 rounded-full"
-                      onClick={handleEditProfilePic}
-                    >
-                      <Camera className="h-4 w-4" />
-                    </Button>
+                    <>
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        className="absolute -bottom-0 bg-[#122759] cursor-pointer -right-0 h-8 w-8 rounded-full"
+                        onClick={handleEditProfilePic}
+                      >
+                        <Camera className="h-4 w-4" />
+                      </Button>
+
+                      {/* hidden file input */}
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleFileChange}
+                      />
+                    </>
                   )}
                 </div>
 
@@ -126,7 +174,7 @@ export default function Profile() {
 
                     <div className="flex gap-2 mt-4 md:mt-0">
                       {profileUser.isOwnProfile ? (
-                        <Button variant="outline" className="gap-2" onClick={handleEditProfile}>
+                        <Button variant="outline" className="gap-2 cursor-pointer" onClick={handleEditProfile}>
                           <Edit className="h-4 w-4" />
                           Edit Profile
                         </Button>
@@ -226,7 +274,7 @@ export default function Profile() {
                 type="submit"
                 className="bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105"
               >
-                Save Changes
+                {isLoadingAsAccountUpdate ? <LoaderTwo /> : "Save"}
               </Button>
             </div>
           </form>

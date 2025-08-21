@@ -35,9 +35,6 @@ function Register() {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
 
-    console.log(formData);
-
-
     try {
       const res = await register(formData).unwrap()
       toast.success(res.message)

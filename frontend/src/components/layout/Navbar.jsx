@@ -6,9 +6,9 @@ import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { LogOut, Menu, Search, Settings, User, X } from 'lucide-react';
 import { Input } from '../ui/input';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLogoutMutation } from '@/redux/api/userApiSlice';
-import { getUser } from '@/redux/features/userSlice';
+import { getEmail, getMyProfile, getUser } from '@/redux/features/userSlice';
 import toast from 'react-hot-toast';
 
 function Navbar() {
@@ -16,6 +16,7 @@ function Navbar() {
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useDispatch()
 
     const handleSearch = (e) => {
         e.preventDefault()
@@ -26,24 +27,23 @@ function Navbar() {
     }
 
     const isActivePath = (path) => (location.pathname === path)
-
-    const user = {
-        name: "John Doe",
-        avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face",
-        email: "john@example.com"
-    };
-
     const isAuthenticated = useSelector((state) => state.user.user);
 
-    console.log(isAuthenticated.username);
-    
+    const user = {
+        name: isAuthenticated?.username,
+        avatar: isAuthenticated?.profilePic,
+        email: isAuthenticated?.gmail
+    };
+
 
     const [logoutApi] = useLogoutMutation()
 
     const handleSignOut = async () => {
         try {
-            await logoutApi().unwrap();
+            const res = await logoutApi().unwrap();
             dispatch(getUser(null));
+            dispatch(getMyProfile(null));
+            dispatch(getEmail(null));
             toast.success(res.message)
             navigate("/login");
         } catch (error) {

@@ -30,9 +30,6 @@ function Login() {
 
     const handleSubmitForm = async (e) => {
         e.preventDefault();
-
-        console.log(formData);
-
         try {
             const res = await login(formData).unwrap()
             toast.success(res.message)

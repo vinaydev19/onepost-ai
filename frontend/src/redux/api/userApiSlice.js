@@ -131,6 +131,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
             query: (username) => ({
                 url: `${USERS_URL}/profile/${username}`
             }),
+            providesTags: ['User'],
         }),
     })
 })
@@ -150,5 +151,6 @@ export const {
     useEmailChangeMutation,
     useEmailConfirmMutation,
     useGetCurrentUserQuery,
-    useGetUserProfileQuery
+    useGetUserProfileQuery,
+    useAccountUpdateMutation
 } = userApiSlice
