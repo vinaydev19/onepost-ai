@@ -11,6 +11,8 @@ import { useGetBlogBySlugQuery } from '@/redux/api/blogApiSlice';
 import { useState } from 'react';
 import { useToggleBlogLikeMutation } from '@/redux/api/likesApiSlice';
 import toast from 'react-hot-toast';
+import { CommentModal } from '@/components/common/CommentModel';
+import { useSelector } from 'react-redux';
 
 
 function BlogPost() {
@@ -18,6 +20,9 @@ function BlogPost() {
     const { data, isLoading } = useGetBlogBySlugQuery(slug)
     const [Blog, setBlog] = useState();
     const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+    const currentUser = useSelector((state) => state.user.user);
+
 
     useEffect(() => {
         if (data?.data?.oneBlog[0]) {
@@ -113,6 +118,7 @@ function BlogPost() {
                             variant="ghost"
                             size="sm"
                             className="gap-2 hover:text-primary text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer"
+                            onClick={() => setIsCommentModalOpen(true)}
                         >
                             <MessageCircle className="h-5 w-5" />
                             {Blog?.commentsCount}
@@ -185,10 +191,18 @@ function BlogPost() {
                                         </div>
                                     </div>
                                 </CardContent>
+
                             </Card>
                         ))}
                     </div>
                 </div>
+
+                <CommentModal
+                    isOpen={isCommentModalOpen}
+                    onClose={() => setIsCommentModalOpen(false)}
+                    postId={Blog?.slug}
+                    currentUser={currentUser}
+                />
             </article>
         </div>
     )

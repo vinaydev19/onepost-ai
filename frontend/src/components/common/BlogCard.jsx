@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Card, CardContent } from '../ui/card';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -7,9 +7,60 @@ import { Button } from '../ui/button';
 import { Heart, MessageCircle, Bookmark, MoreHorizontal } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useToggleBlogLikeMutation } from '@/redux/api/likesApiSlice';
+import { CommentModal } from './CommentModel';
+import { useSelector } from 'react-redux';
+
+// Mock comments data
+export const mockComments = [
+    {
+        id: "c1",
+        author: {
+            name: "Alice Johnson",
+            avatar: "https://i.pravatar.cc/100?img=1",
+            username: "alicej",
+        },
+        content: "This is a really insightful post! Thanks for sharing 🙌",
+        publishedAt: "2025-08-20T12:30:00Z",
+        likes: 5,
+        isLiked: true,
+    },
+    {
+        id: "c2",
+        author: {
+            name: "Bob Smith",
+            avatar: "https://i.pravatar.cc/100?img=2",
+            username: "bobsmith",
+        },
+        content: "I completely agree with your points, especially about scalability.",
+        publishedAt: "2025-08-21T09:15:00Z",
+        likes: 2,
+        isLiked: false,
+    },
+    {
+        id: "c3",
+        author: {
+            name: "Charlie Kim",
+            avatar: "https://i.pravatar.cc/100?img=3",
+            username: "charliek",
+        },
+        content: "Can you expand more on the database optimization part?",
+        publishedAt: "2025-08-23T18:45:00Z",
+        likes: 0,
+        isLiked: false,
+    },
+];
+
+// Mock current user
+export const mockCurrentUser = {
+    name: "You",
+    avatar: "https://i.pravatar.cc/100?img=4",
+};
+
 
 function BlogCard({ post, variant = "card", showImage = true }) {
     const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+    const currentUser = useSelector((state) => state.user.user);
 
 
     const formatDate = (dateString) => {
@@ -83,8 +134,10 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                                         variant="ghost"
                                         size="sm"
                                         className="h-8 px-3 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer"
+                                        onClick={() => setIsCommentModalOpen(true)}
                                     >
                                         <MessageCircle className="h-4 w-4 mr-1" />
+                                        {post?.commentsCount}
                                     </Button>
                                 </div>
 
@@ -106,6 +159,12 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                         </div>
                     </div>
                 </CardContent>
+                <CommentModal
+                    isOpen={isCommentModalOpen}
+                    onClose={() => setIsCommentModalOpen(false)}
+                    postId={post?.slug}
+                    currentUser={currentUser}
+                />
             </Card>
         )
     }
@@ -163,11 +222,11 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                             variant="ghost"
                             size="sm"
                             className="h-8 px-3 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer"
+                            onClick={() => setIsCommentModalOpen(true)}
                         >
                             <MessageCircle className="h-4 w-4 mr-1" />
+                            {post?.commentsCount}
                         </Button>
-
-                        <span className="text-xs text-gray-400">{post?.readTime}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -186,6 +245,13 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                     </div>
                 </div>
             </CardContent>
+
+            <CommentModal
+                isOpen={isCommentModalOpen}
+                onClose={() => setIsCommentModalOpen(false)}
+                postId={post?.slug}
+                currentUser={currentUser}
+            />
         </Card>
     );
 
