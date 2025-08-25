@@ -9,31 +9,21 @@ import { Heart, MessageCircle, Bookmark, Share2, Twitter, Facebook, Link as Link
 import { cn } from "@/lib/utils";
 import { useGetBlogBySlugQuery } from '@/redux/api/blogApiSlice';
 import { useState } from 'react';
+import { useToggleBlogLikeMutation } from '@/redux/api/likesApiSlice';
+import toast from 'react-hot-toast';
 
 
 function BlogPost() {
     const { slug } = useParams();
     const { data, isLoading } = useGetBlogBySlugQuery(slug)
     const [Blog, setBlog] = useState();
-    const [comment, setComment] = useState([]);
+    const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
 
     useEffect(() => {
         if (data?.data?.oneBlog[0]) {
             setBlog(data?.data?.oneBlog[0]);
         }
     }, [data]);
-
-    useEffect(() => {
-        if (data?.data?.oneBlog[0]?.comments) {
-            setComment(data?.data?.oneBlog[0]?.comments[0]);
-        }
-    }, [data]);
-
-    console.log(Blog, "blog");
-    console.log(comment, "comment");
-    console.log(data?.data?.oneBlog[0]?.comments, "comment data");
-    console.log(data, "data");
-
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -43,6 +33,23 @@ function BlogPost() {
             year: 'numeric'
         });
     };
+
+    const toggleLike = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await toggleBlogLike(slug).unwrap()
+            toast.success(res.message)
+
+            setBlog((prev) => ({
+                ...prev,
+                isLiked: !prev.isLiked,
+                likesCount: prev.isLiked ? prev.likesCount - 1 : prev.likesCount + 1,
+            }))
+        } catch (error) {
+            console.error("Error while liking blog:", error)
+            toast.error(error?.data?.message || "Something went wrong while liking")
+        }
+    }
 
     if (isLoading) {
         return (
@@ -96,7 +103,7 @@ function BlogPost() {
                             variant="ghost"
                             size="sm"
                             className={`gap-2 text-gray-400  hover:text-red-500 hover:bg-[#1e293b]  hover:cursor-pointer ${Blog?.isLiked ? "text-red-500" : ""}`}
-
+                            onClick={toggleLike}
                         >
                             <Heart className={`h-4 w-4 mr-1 ${Blog?.isLiked ? "fill-current" : ""}`} />
                             {Blog?.likesCount}
@@ -105,7 +112,7 @@ function BlogPost() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="gap-2 text-gray-400 hover:text-primary"
+                            className="gap-2 hover:text-primary text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer"
                         >
                             <MessageCircle className="h-5 w-5" />
                             {Blog?.commentsCount}

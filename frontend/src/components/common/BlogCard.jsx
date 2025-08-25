@@ -5,8 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Heart, MessageCircle, Bookmark, MoreHorizontal } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useToggleBlogLikeMutation } from '@/redux/api/likesApiSlice';
 
 function BlogCard({ post, variant = "card", showImage = true }) {
+    const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
+
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
@@ -15,6 +20,17 @@ function BlogCard({ post, variant = "card", showImage = true }) {
             year: 'numeric'
         });
     };
+
+    const toggleLike = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await toggleBlogLike(post?.slug).unwrap()
+            toast.success(res.message)
+        } catch (error) {
+            console.error("Error while liking blog:", error)
+            toast.error(error?.data?.message || "Something went wrong while liking")
+        }
+    }
 
     if (variant === "list") {
         return (
@@ -57,6 +73,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                                         variant="ghost"
                                         size="sm"
                                         className={`h-8 px-3 text-gray-400 hover:cursor-pointer hover:text-red-500 hover:bg-[#1e293b] ${post?.isLiked ? "text-red-500" : ""}`}
+                                        onClick={toggleLike}
                                     >
                                         <Heart className={`h-4 w-4 mr-1 ${post?.isLiked ? "fill-current" : ""}`} />
                                         {post?.likesCount}
@@ -136,7 +153,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                             variant="ghost"
                             size="sm"
                             className={`h-8 px-3 text-gray-400 hover:cursor-pointer hover:text-red-500 hover:bg-[#1e293b] ${post?.isLiked ? "text-red-500" : ""}`}
-
+                            onClick={toggleLike}
                         >
                             <Heart className={`h-4 w-4 mr-1 ${post?.isLiked ? "fill-current" : ""}`} />
                             {post?.likesCount}
