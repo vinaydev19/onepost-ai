@@ -17,7 +17,7 @@ export const blogApiSlice = apiSlice.injectEndpoints({
                 url: `${BLOGS_URL}/get-blogs`,
                 params: { page, limit, sortBy, sortType, category, query }
             }),
-            providesTags: ["Blog"],
+            providesTags: ["Blog", "Comment"],
             async onQueryStarted(params, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled
@@ -32,7 +32,7 @@ export const blogApiSlice = apiSlice.injectEndpoints({
             query: (slug) => ({
                 url: `${BLOGS_URL}/get-blog/${slug}`,
             }),
-            providesTags: ["Blog"],
+            providesTags: ["Blog", "Comment"],
         }),
         updateBlog: builder.mutation({
             query: ({ id, formData }) => ({

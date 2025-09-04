@@ -35,10 +35,6 @@ function BlogPost() {
     const currentUser = useSelector((state) => state.user.user);
     const [deleteComment, { isLoading: isDeleting }] = useDeleteCommentMutation();
 
-
-    console.log(commentsData);
-
-
     useEffect(() => {
         if (data?.data?.oneBlog[0]) {
             setBlog(data?.data?.oneBlog[0]);
@@ -214,33 +210,52 @@ function BlogPost() {
                                 <Card key={comment._id} className="animate-fade-in">
                                     <CardContent className="p-6">
                                         <div className="flex gap-4">
-                                            <Avatar className="h-10 w-10">
-                                                <AvatarImage
-                                                    src={comment.commentedByUser.profilePic || ""}
-                                                    alt={comment.commentedByUser.username}
-                                                />
-                                                <AvatarFallback>
-                                                    {comment.commentedByUser.username?.[0]}
-                                                </AvatarFallback>
-                                            </Avatar>
+                                            {/* Avatar */}
+                                            <Link
+                                                to={`/profile/${comment.commentedByUser.username}`}
+                                                className=" text-gray-400 hover:opacity-80 transition-opacity"                                            >
+                                                <Avatar className="h-10 w-10">
+                                                    <AvatarImage
+                                                        src={comment.commentedByUser.profilePic || ""}
+                                                        alt={comment.commentedByUser.username}
+                                                    />
+                                                    <AvatarFallback>
+                                                        {comment.commentedByUser.username?.[0]}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </Link>
+
+                                            {/* Main content */}
                                             <div className="flex-1">
-                                                <div className="flex items-center justify-between gap-2 mb-2">
-                                                    <div className='flex items-center gap-2 mb-2'>
-                                                        <p className="font-semibold">
+                                                {/* Username + Date + Menu */}
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <Link
+                                                            to={`/profile/${comment.commentedByUser.username}`}
+                                                            className="flex items-center gap-2 text-gray-400 hover:opacity-80 transition-opacity"                                                        >
                                                             {comment.commentedByUser.username}
-                                                        </p>
+                                                        </Link>
                                                         <span className="text-xs text-gray-400">
                                                             {formatDate(comment.createdAt)}
                                                         </span>
                                                     </div>
+
+                                                    {/* Menu for owner */}
                                                     {currentUser?._id === comment.commentedByUser._id && (
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="text-gray-400 hover:text-white"
+                                                                >
                                                                     <MoreVertical className="h-5 w-5" />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
-                                                            <DropdownMenuContent align="end" className="bg-[#1e293b] text-white">
+                                                            <DropdownMenuContent
+                                                                align="end"
+                                                                className="bg-[#1e293b] text-white"
+                                                            >
                                                                 <DropdownMenuItem
                                                                     onClick={() => handleEditComment(comment)}
                                                                     className="flex items-center gap-2 cursor-pointer"
@@ -257,19 +272,26 @@ function BlogPost() {
                                                         </DropdownMenu>
                                                     )}
                                                 </div>
-                                                <p className="text-gray-400 mb-3">{comment.content}</p>
+
+                                                {/* Comment text */}
+                                                <p className="text-gray-400 mt-1 mb-3">{comment.content}</p>
+
+                                                {/* Like button */}
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className={`gap-2 text-gray-400  hover:text-red-500 hover:bg-[#1e293b]  hover:cursor-pointer ${comment?.isLiked ? "text-red-500" : ""}`}
-                                                    onClick={() => toggleLikeComment(comment._id)}   // ✅ correct
+                                                    className={`gap-2 text-gray-400 hover:text-red-500 hover:bg-[#1e293b] hover:cursor-pointer ${comment?.isLiked ? "text-red-500" : ""
+                                                        }`}
+                                                    onClick={() => toggleLikeComment(comment._id)}
                                                 >
-                                                    <Heart className={`h-4 w-4 mr-1 ${comment?.isLiked ? "fill-current" : ""}`} />
+                                                    <Heart
+                                                        className={`h-4 w-4 mr-1 ${comment?.isLiked ? "fill-current" : ""
+                                                            }`}
+                                                    />
                                                     {comment.likesCount}
                                                 </Button>
                                             </div>
                                         </div>
-
                                     </CardContent>
                                 </Card>
                             ))}
