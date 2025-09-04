@@ -7,7 +7,7 @@ import { Comment } from "../models/comment.model.js"
 
 const addComment = asyncHandler(async (req, res) => {
     const { slug } = req.params;
-    const { content } = req.body;    
+    const { content } = req.body;
 
     if (!slug) {
         throw new ApiError(404, "Blog not found");
@@ -43,22 +43,80 @@ const getAllComments = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Blog not found");
     }
 
-    const blogId = await Blog.findOne({ slug })
+    const blog = await Blog.findOne({ slug });
 
-    if (!blogId) {
+    if (!blog) {
         throw new ApiError(404, "Blog not found");
     }
 
-
-    const comments = await Comment.find({ Blog: blogId })
-        .populate("commentedBy", "username email")
+    const comments = await Comment.aggregate([
+        {
+            $match: { Blog: blog._id }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "commentedBy",
+                foreignField: "_id",
+                as: "commentedByUser",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            profilePic: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$commentedByUser"
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "comment",
+                as: "likes"
+            }
+        },
+        {
+            $addFields: {
+                likesCount: { $size: "$likes" },
+                isLiked: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$likes.likedBy"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                content: 1,
+                commentedBy: 1,
+                commentedByUser: {  // populated user details
+                    username: 1,
+                    profilePic: 1,
+                    _id: 1
+                },
+                createdAt: 1,
+                likesCount: 1,
+                isLiked: 1
+            }
+        }
+    ]);
 
     if (!comments || comments.length === 0) {
         throw new ApiError(404, "No comments found for this blog");
     }
 
-    return res.status(200).json(new ApiResponse(200, { comments }, "Comments fetched successfully"));
-})
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { comments }, "Comments fetched successfully"));
+});
 
 const deleteComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params;

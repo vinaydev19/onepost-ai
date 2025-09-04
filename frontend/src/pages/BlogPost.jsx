@@ -5,23 +5,38 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MessageCircle, Bookmark, Share2, Twitter, Facebook, Link as LinkIcon, UserPlus } from "lucide-react";
+import { MoreVertical, Edit, Trash2, Heart, MessageCircle, Bookmark, Share2, Twitter, Facebook, Link as LinkIcon, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGetBlogBySlugQuery } from '@/redux/api/blogApiSlice';
 import { useState } from 'react';
-import { useToggleBlogLikeMutation } from '@/redux/api/likesApiSlice';
+import { useToggleBlogLikeMutation, useToggleCommentLikeMutation } from '@/redux/api/likesApiSlice';
 import toast from 'react-hot-toast';
 import { CommentModal } from '@/components/common/CommentModel';
 import { useSelector } from 'react-redux';
+import { useDeleteCommentMutation, useGetCommentsQuery } from '@/redux/api/commentApiSlice';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 
 function BlogPost() {
     const { slug } = useParams();
     const { data, isLoading } = useGetBlogBySlugQuery(slug)
+    const { data: commentsData, isLoading: commentsLoading } = useGetCommentsQuery(slug);
     const [Blog, setBlog] = useState();
     const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
+    const [toggleCommentLike, { isLoading: isCommentLiking }] = useToggleCommentLikeMutation()
     const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+    const [editingComment, setEditingComment] = useState(null);
     const currentUser = useSelector((state) => state.user.user);
+    const [deleteComment, { isLoading: isDeleting }] = useDeleteCommentMutation();
+
+
+    console.log(commentsData);
 
 
     useEffect(() => {
@@ -53,6 +68,32 @@ function BlogPost() {
         } catch (error) {
             console.error("Error while liking blog:", error)
             toast.error(error?.data?.message || "Something went wrong while liking")
+        }
+    }
+
+    const handleEditComment = (comment) => {
+        setEditingComment(comment);
+        setIsCommentModalOpen(true);
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            const res = await deleteComment(commentId).unwrap();
+            toast.success(res.message || "Comment deleted successfully");
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+            toast.error(error?.data?.message || "Something went wrong while deleting comment");
+        }
+    };
+
+
+    const toggleLikeComment = async (commentId) => {
+        try {
+            const res = await toggleCommentLike(commentId).unwrap();
+            toast.success(res.message)
+        } catch (error) {
+            console.error("Error while liking comment:", error);
+            toast.error(error?.data?.message || "Something went wrong while liking comment");
         }
     }
 
@@ -161,47 +202,90 @@ function BlogPost() {
 
                 {/* Comments Section */}
                 <div className="mb-8">
-                    <h3 className="text-2xl font-bold mb-6">Comments ({Blog?.commentsCount || Blog?.comments?.length || 0})</h3>
+                    <h3 className="text-2xl font-bold mb-6">
+                        Comments ({commentsData?.comments?.length || 0})
+                    </h3>
 
-                    <div className="space-y-6">
-                        {Blog?.comments?.map((comment) => (
-                            <Card key={comment._id} className="animate-fade-in">
-                                <CardContent className="p-6">
-                                    <div className="flex gap-4">
-                                        <Avatar className="h-10 w-10">
-                                            <AvatarImage src={comment.commentedByUser.profilePic || ""} alt={comment.commentedByUser.username} />
-                                            <AvatarFallback>{comment.commentedByUser.username?.[0]}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <p className="font-semibold">{comment.commentedByUser.username}</p>
-                                                <span className="text-xs text-gray-400">
-                                                    {formatDate(comment.createdAt)}
-                                                </span>
+                    {commentsLoading ? (
+                        <p>Loading comments...</p>
+                    ) : (
+                        <div className="space-y-6">
+                            {commentsData?.data?.comments?.map((comment) => (
+                                <Card key={comment._id} className="animate-fade-in">
+                                    <CardContent className="p-6">
+                                        <div className="flex gap-4">
+                                            <Avatar className="h-10 w-10">
+                                                <AvatarImage
+                                                    src={comment.commentedByUser.profilePic || ""}
+                                                    alt={comment.commentedByUser.username}
+                                                />
+                                                <AvatarFallback>
+                                                    {comment.commentedByUser.username?.[0]}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between gap-2 mb-2">
+                                                    <div className='flex items-center gap-2 mb-2'>
+                                                        <p className="font-semibold">
+                                                            {comment.commentedByUser.username}
+                                                        </p>
+                                                        <span className="text-xs text-gray-400">
+                                                            {formatDate(comment.createdAt)}
+                                                        </span>
+                                                    </div>
+                                                    {currentUser?._id === comment.commentedByUser._id && (
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+                                                                    <MoreVertical className="h-5 w-5" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="bg-[#1e293b] text-white">
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handleEditComment(comment)}
+                                                                    className="flex items-center gap-2 cursor-pointer"
+                                                                >
+                                                                    <Edit className="h-4 w-4" /> Edit
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handleDeleteComment(comment._id)}
+                                                                    className="flex items-center gap-2 text-red-500 cursor-pointer"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" /> Delete
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    )}
+                                                </div>
+                                                <p className="text-gray-400 mb-3">{comment.content}</p>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className={`gap-2 text-gray-400  hover:text-red-500 hover:bg-[#1e293b]  hover:cursor-pointer ${comment?.isLiked ? "text-red-500" : ""}`}
+                                                    onClick={() => toggleLikeComment(comment._id)}   // ✅ correct
+                                                >
+                                                    <Heart className={`h-4 w-4 mr-1 ${comment?.isLiked ? "fill-current" : ""}`} />
+                                                    {comment.likesCount}
+                                                </Button>
                                             </div>
-                                            <p className="text-gray-400 mb-3">{comment.content}</p>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className={`gap-2 text-gray-400  hover:text-red-500 hover:bg-[#1e293b]  hover:cursor-pointer  ${comment.isLiked ? "text-red-500" : ""}`}
-                                            >
-                                                <Heart className={`h-4 w-4 mr-1 ${comment?.isLiked ? "fill-current" : ""}`} />
-                                                {comment.likesCount}
-                                            </Button>
                                         </div>
-                                    </div>
-                                </CardContent>
 
-                            </Card>
-                        ))}
-                    </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <CommentModal
                     isOpen={isCommentModalOpen}
-                    onClose={() => setIsCommentModalOpen(false)}
+                    onClose={() => {
+                        setIsCommentModalOpen(false)
+                        setEditingComment(null)
+                    }}
                     postId={Blog?.slug}
                     currentUser={currentUser}
+                    editingComment={editingComment}
                 />
             </article>
         </div>

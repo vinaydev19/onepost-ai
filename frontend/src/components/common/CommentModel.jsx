@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -11,28 +11,49 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCreateCommentMutation, useUpdateCommentMutation } from "@/redux/api/commentApiSlice";
+import toast from "react-hot-toast";
+import { useGetBlogBySlugQuery } from "@/redux/api/blogApiSlice";
 
-export function CommentModal({ isOpen, onClose, postId, currentUser }) {
+export function CommentModal({ isOpen, onClose, postId, currentUser, editingComment }) {
     const [newComment, setNewComment] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [createComment] = useCreateCommentMutation()
+    const [updateComment] = useUpdateCommentMutation()
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        });
-    };
+    useEffect(() => {
+        if (editingComment) {
+            setNewComment(editingComment?.content);
+        } else {
+            setNewComment("");
+        }
+    }, [editingComment, isOpen]);
 
-    const handleSubmitComment = async () => {
+    const handleSubmitComment = async (e) => {
+        e.preventDefault();
+        try {
+            let res;
+            if (editingComment) {
+                res = await updateComment({
+                    commentId: editingComment._id,
+                    content: newComment,
+                }).unwrap();
+            } else {
+                res = await createComment({ content: newComment, slug: postId }).unwrap();
+            }
+            toast.success(res.message);
+            setNewComment("");
+            onClose();
+        } catch (error) {
+            console.error("Error while submitting comment:", error);
+            toast.error(error?.data?.message || "Something went wrong");
+        }
     };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose} className="bg-[#020817]">
             <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col bg-[#020817] text-white">
                 <DialogHeader>
-                    <DialogTitle>Comments</DialogTitle>
+                    <DialogTitle>{editingComment ? "Edit Comment" : "Add Comment"}</DialogTitle>
                 </DialogHeader>
                 {currentUser && (
                     <div className="border-t pt-4 mt-4 ">
@@ -53,12 +74,12 @@ export function CommentModal({ isOpen, onClose, postId, currentUser }) {
                                 <div className="flex justify-end">
                                     <Button
                                         onClick={handleSubmitComment}
-                                        disabled={!newComment.trim() || isSubmitting}
+                                        disabled={!newComment.trim()}
                                         size="sm"
                                         className="gap-2 bg-[#6c46e2] transition-transform duration-200 hover:scale-105 hover:cursor-pointer"
                                     >
                                         <Send className="h-4 w-4" />
-                                        {isSubmitting ? "Posting..." : "Post Comment"}
+                                        {editingComment ? "Update" : "Post"}
                                     </Button>
                                 </div>
                             </div>

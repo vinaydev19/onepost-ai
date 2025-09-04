@@ -6,7 +6,7 @@ export const apiSlice = createApi({
         baseUrl: BASE_URL,
         credentials: "include",
     }),
-    tagTypes: ["User", "Blogs"],
+    tagTypes: ["User", "Blogs", "Comment"],
     endpoints: (builder) => ({}),
     keepUnusedDataFor: 60 * 60 * 24 * 7,
 })
