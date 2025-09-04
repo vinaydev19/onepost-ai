@@ -19,13 +19,13 @@ const toggleFollow = asyncHandler(async (req, res) => {
 
     if (existingFollow) {
         await existingFollow.deleteOne();
-        return res.status(200).json(new ApiResponse("Unfollowed successfully"));
+        return res.status(200).json(new ApiResponse(200, {}, "Unfollowed successfully"));
     } else {
         await Follow.create({
             followerId: currentUserId,
             followingId: userId
         });
-        return res.status(201).json(new ApiResponse("Followed successfully"));
+        return res.status(201).json(new ApiResponse(200, {}, "Followed successfully"));
     }
 });
 

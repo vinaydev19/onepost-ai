@@ -517,6 +517,8 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
         throw new ApiError(400, "username is required")
     }
 
+    console.log(req.user?._id);
+    
 
     const user = await User.aggregate([
         {
@@ -528,7 +530,7 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
             $lookup: {
                 from: "follows",
                 localField: "_id",
-                foreignField: "followerId",
+                foreignField: "followingId",
                 as: "followers"
             }
         },
@@ -536,7 +538,7 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
             $lookup: {
                 from: "follows",
                 localField: "_id",
-                foreignField: "followingId",
+                foreignField: "followerId",
                 as: "following"
             }
         },
@@ -548,11 +550,9 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
                 followingCount: {
                     $size: "$following"
                 },
-                isFollowingCount: {
+                isFollowing: {
                     $cond: {
-                        if: {
-                            $in: [req.user?._id, "$followers.followers"]
-                        },
+                        if: { $in: [req.user?._id, "$followers.followerId"] },
                         then: true,
                         else: false
                     }
@@ -567,7 +567,7 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
                 bio: 1,
                 followersCount: 1,
                 followingCount: 1,
-                isFollowingCount: 1,
+                isFollowing: 1,
                 profilePic: 1,
                 createdAt: 1
             }

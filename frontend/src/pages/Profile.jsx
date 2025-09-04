@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { useAccountUpdateMutation, useGetUserProfileQuery, useProfilePictureMutation } from "@/redux/api/userApiSlice";
 import toast from "react-hot-toast";
 import { LoaderTwo } from "@/components/ui/loader";
+import { useToggleFollowMutation } from "@/redux/api/followApiSlice";
 
 export default function Profile() {
   const { username } = useParams();
@@ -24,17 +25,13 @@ export default function Profile() {
   const [profileUser, setProfileUser] = useState(null);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-
   const currentUser = useSelector((state) => state.user.user);
-
-  const { data, error, isLoading } = useGetUserProfileQuery(username);
-
+  const { data, error, isLoading, refetch } = useGetUserProfileQuery(username);
   const handleEditProfile = () => setIsEditDialogOpen(true);
   const [accountUpdate, { isLoadingAsAccountUpdate }] = useAccountUpdateMutation()
   const [profilePicture] = useProfilePictureMutation();
-
-
-
+  const [toggleFollow, { isLoading: isFollowLoading }] = useToggleFollowMutation();
+  
   useEffect(() => {
     if (data) {
       setProfileUser({
@@ -62,9 +59,6 @@ export default function Profile() {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
-
-
-
 
   const handleEditProfilePic = async (e) => {
     e.preventDefault();
@@ -115,6 +109,22 @@ export default function Profile() {
     }));
   };
 
+  const handleToggleFollow = async () => {
+    try {
+      const res = await toggleFollow(data?.data._id).unwrap(); // pass userId
+      toast.success(res.message || "Updated follow status");      
+
+      setProfileUser((prev) => ({
+        ...prev,
+        isFollowing: !prev.isFollowing,
+        followers: prev.isFollowing ? prev.followers - 1 : prev.followers + 1
+      }));
+    } catch (error) {
+      console.log("Error while toggling follow", error);
+      toast.error(error.data?.message || "Failed to update follow");
+    }
+  };
+
   if (isLoading) {
     return <div className="text-center text-white">Loading...</div>;
   }
@@ -124,7 +134,7 @@ export default function Profile() {
   }
 
   if (!profileUser) {
-    return null; // or skeleton UI
+    return null; // TODO: skeleton UI
   }
 
   return (
@@ -151,8 +161,6 @@ export default function Profile() {
                       >
                         <Camera className="h-4 w-4" />
                       </Button>
-
-                      {/* hidden file input */}
                       <input
                         type="file"
                         ref={fileInputRef}
@@ -181,8 +189,10 @@ export default function Profile() {
                       ) : (
                         <>
                           <Button
+                            onClick={handleToggleFollow}
+                            disabled={isFollowLoading}
                             variant={profileUser.isFollowing ? "secondary" : "default"}
-                            className="gap-2 bg-[#6c46e2]"
+                            className="gap-2 bg-[#6c46e2] cursor-pointer"
                           >
                             <UserPlus className="h-4 w-4" />
                             {profileUser.isFollowing ? "Following" : "Follow"}
