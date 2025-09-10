@@ -16,6 +16,9 @@ import PasswordChange from './PasswordChange'
 import EmailChange from './EmailChange'
 import Editor from './Editor'
 import BlogPost from './BlogPost'
+import ChangePassword from './ChangePassword'
+import EmailChangeVerification from './EmailChangeVerification'
+import EmailChangeConfirmation from './EmailChangeConfirmation'
 
 function Body() {
     const router = createBrowserRouter(
@@ -37,6 +40,9 @@ function Body() {
                         <Route path='blog/:slug' element={<BlogPost />} />
                         <Route path='reading-lists' element={<ReadingLists />} />
                         <Route path='write-new-blog' element={<Editor />} />
+                        <Route path='change-password' element={<ChangePassword />} />
+                        <Route path="/email-change-verification" element={<EmailChangeVerification />} />
+                        <Route path="/email-change-confirmation" element={<EmailChangeConfirmation />} />
                     </Route>
                 </Route>
             </>
