@@ -212,6 +212,83 @@ export const Tiptap = ({ content, onChange, placeholder }) => {
 
                 <Separator orientation="vertical" className="h-8 bg-white" />
 
+                <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" title="Insert Link">
+                            <LinkIcon className="h-4 w-4" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className='bg-[#020817] text-white'>
+                        <DialogHeader>
+                            <DialogTitle>Insert Link</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-2">
+                            <Label htmlFor="link">URL</Label>
+                            <Input id="link" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
+                            <Button onClick={addLink} className='bg-[#6b40e2] hover:cursor-pointer'>Insert</Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                <Separator orientation="vertical" className="h-8 bg-white" />
+
+                <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" title="Insert Image">
+                            <ImageIcon className="h-4 w-4" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#020817] text-white">
+                        <DialogHeader>
+                            <DialogTitle>Insert Image</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            {/* Option 1: URL input */}
+                            <div>
+                                <Label htmlFor="imageUrl" className='mb-2'>Image URL</Label>
+                                <Input
+                                    id="imageUrl"
+                                    value={imageUrl}
+                                    onChange={(e) => setImageUrl(e.target.value)}
+                                    placeholder="https://example.com/my-image.png"
+                                />
+                                <Button
+                                    onClick={addImage}
+                                    className="mt-2 bg-[#6b40e2] hover:cursor-pointer"
+                                >
+                                    Insert from URL
+                                </Button>
+                            </div>
+
+                            {/* Option 2: File Upload */}
+                            <div>
+                                <Label htmlFor="fileUpload" className='mb-2'>Upload File</Label>
+                                <Input
+                                    id="fileUpload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file && editor) {
+                                            const reader = new FileReader()
+                                            reader.readAsDataURL(file)
+                                            reader.onload = () => {
+                                                editor.chain().focus().setImage({ src: reader.result }).run()
+                                            }
+                                            setIsImageDialogOpen(false)
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+
+
+                <Separator orientation="vertical" className="h-8 bg-white" />
+
+
                 <Button variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo">
                     <Undo className="h-4 w-4" />
                 </Button>

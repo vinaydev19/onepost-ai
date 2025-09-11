@@ -23,7 +23,6 @@ const Editor = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [mode, setMode] = useState('write');
     const [wordCount, setWordCount] = useState(0);
-    const [readingTime, setReadingTime] = useState(0);
     const [lastSaved, setLastSaved] = useState(null);
 
     const categories = [
@@ -37,7 +36,6 @@ const Editor = () => {
         const textContent = content.replace(/<[^>]*>/g, ' ').trim();
         const words = textContent.split(/\s+/).filter(word => word.length > 0);
         setWordCount(words.length);
-        setReadingTime(Math.ceil(words.length / 200));
     }, [content]);
 
     useEffect(() => {
@@ -84,7 +82,7 @@ const Editor = () => {
                     </div>
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground">
-                            {wordCount} words • {readingTime} min read
+                            {wordCount} words
                         </span>
                         <Button variant="ghost" size="sm" onClick={() => setIsFullscreen(false)}>
                             <Minimize className="h-4 w-4" />
@@ -152,7 +150,7 @@ const Editor = () => {
                                         <div className="p-6 min-h-[600px]">
                                             <h1 className="text-4xl font-bold mb-8">{title || 'Untitled Post'}</h1>
                                             <div
-                                                className="prose prose-lg max-w-none"
+                                                className="prose prose-invert prose-lg max-w-none"
                                                 dangerouslySetInnerHTML={{ __html: content }}
                                             />
                                         </div>
@@ -164,9 +162,7 @@ const Editor = () => {
                         <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-4">
                                 <span>{wordCount} words</span>
-                                <span>{readingTime} min read</span>
                                 {lastSaved && <span>Auto-saved {formatDate(lastSaved)}</span>}
-
                             </div>
                         </div>
                     </div>
@@ -178,11 +174,14 @@ const Editor = () => {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center space-x-2">
-                                    <Switch
-                                        id="draft-mode"
-                                        checked={isDraft}
-                                        onCheckedChange={setIsDraft}
-                                    />
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={isDraft}
+                                            onChange={(e) => setIsDraft(e.target.checked)}
+                                        />
+                                        <span className="slider"></span>
+                                    </label>
                                     <Label htmlFor="draft-mode">Save as draft</Label>
                                 </div>
 
@@ -190,9 +189,6 @@ const Editor = () => {
                                     <Button className="flex-1 bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105">
                                         <Save className="w-4 h-4 mr-2" />
                                         {isDraft ? 'Save Draft' : 'Publish'}
-                                    </Button>
-                                    <Button variant="outline">
-                                        <Eye className="w-4 h-4" />
                                     </Button>
                                 </div>
                             </CardContent>
