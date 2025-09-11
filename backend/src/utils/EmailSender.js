@@ -78,10 +78,49 @@ const resetPasswordConfirmationEmail = async (name, email) => {
     }
 }
 
+const sendEmailChangeVerification = async (email, verificationCode) => {
+    try {
+        const res = await mailTransporter.sendMail({
+            from: "onePost AI <vinaydev19.projects@gmail.com>",
+            to: email,
+            subject: "Fusion ERP - Verify Your New Email",
+            text: "Verify your new email for Fusion ERP",
+            html: Email_Change_Verification_Template.replace("{verificationCode}", verificationCode)
+        })
+        console.log("Email change verification code sent successfully", res);
+    } catch (error) {
+        console.log(
+            `Something went wrong while sending the email change verification code || ${error}`
+        );
+    }
+}
+
+
+// Send confirmation email after successful email change
+const sendEmailChangeConfirmation = async (name, email) => {
+    try {
+        const res = await mailTransporter.sendMail({
+            from: "onePost AI <vinaydev19.projects@gmail.com>",
+            to: email,
+            subject: "Fusion ERP - Email Change Successful",
+            text: "Your email address has been successfully updated.",
+            html: Email_Change_Confirmation_Email.replace("{name}", name)
+        })
+        console.log("Email change confirmation sent successfully", res);
+    } catch (error) {
+        console.log(
+            `Something went wrong while sending the email change confirmation || ${error}`
+        );
+    }
+}
+
+
 
 export {
     sendVerificationCode,
     sendWelcomeEmail,
     resetPasswordTokenSent,
-    resetPasswordConfirmationEmail
+    resetPasswordConfirmationEmail,
+    sendEmailChangeVerification,
+    sendEmailChangeConfirmation
 }

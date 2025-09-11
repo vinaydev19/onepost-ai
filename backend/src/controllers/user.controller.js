@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.model.js"
 import jwt from "jsonwebtoken"
-import { resetPasswordConfirmationEmail, resetPasswordTokenSent, sendVerificationCode, sendWelcomeEmail } from "../utils/EmailSender.js"
+import { resetPasswordConfirmationEmail, resetPasswordTokenSent, sendEmailChangeConfirmation, sendEmailChangeVerification, sendVerificationCode, sendWelcomeEmail } from "../utils/EmailSender.js"
 import { oauth2Client } from "../utils/googleConfig.js"
 import axios from "axios"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
@@ -451,7 +451,7 @@ const emailChangeVerification = asyncHandler(async (req, res) => {
 
     if (email && email !== user.email) emailUpdate = email;
 
-    const verficationToken = Math.floor(
+    const verificationToken = Math.floor(
         100000 + Math.random() * 900000
     ).toString();
 
@@ -470,7 +470,7 @@ const emailChangeVerification = asyncHandler(async (req, res) => {
         }
     ).select("-password -refreshToken");
 
-    await ChangeEmailVerification(updateUser.email, verficationToken);
+    await sendEmailChangeVerification(updateUser.email, verificationToken);
 
     return res
         .status(200)
@@ -503,7 +503,7 @@ const emailChangeConfirmation = asyncHandler(async (req, res) => {
     user.verificationToken = undefined;
     user.verificationTokenExpiresAt = undefined;
     await user.save({ validateBeforeSave: false });
-    await emailChangeConfirmation(user.email, user.fullName);
+    await sendEmailChangeConfirmation(user.email, user.fullName);
 
     return res
         .status(200)

@@ -349,147 +349,181 @@ export const Password_Reset_Confirmation_Email = `
 `;
 
 export const Email_Change_Verification_Template = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>onePost AI - Verify Your New Email</title>
-      <style>
-          body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-              background-color: #f4f4f4;
-          }
-          .container {
-              max-width: 600px;
-              margin: 30px auto;
-              background: #ffffff;
-              border-radius: 8px;
-              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-              border: 1px solid #ddd;
-          }
-          .header {
-              background-color: #007BFF;
-              color: white;
-              padding: 20px;
-              text-align: center;
-              font-size: 26px;
-              font-weight: bold;
-          }
-          .content {
-              padding: 25px;
-              color: #333;
-              line-height: 1.8;
-          }
-          .verification-code {
-              display: block;
-              margin: 20px 0;
-              font-size: 22px;
-              color: #007BFF;
-              background: #e8f0ff;
-              border: 1px dashed #007BFF;
-              padding: 10px;
-              text-align: center;
-              border-radius: 5px;
-              font-weight: bold;
-              letter-spacing: 2px;
-          }
-          .footer {
-              background-color: #f4f4f4;
-              padding: 15px;
-              text-align: center;
-              color: #777;
-              font-size: 12px;
-              border-top: 1px solid #ddd;
-          }
-          p {
-              margin: 0 0 15px;
-          }
-      </style>
-  </head>
-  <body>
-      <div class="container">
-          <div class="header">onePost AI - Verify Your New Email</div>
-          <div class="content">
-              <p>Hello,</p>
-              <p>You have requested to change your email address for your <strong>onePost AI</strong> account. To proceed, please verify your new email address by entering the code below:</p>
-              <span class="verification-code">{verificationCode}</span>
-              <p>If you did not request this change, please ignore this email or contact our support team immediately.</p>
-          </div>
-          <div class="footer">
-              <p>&copy; ${new Date().getFullYear()} onePost AI. All rights reserved.</p>
-          </div>
-      </div>
-  </body>
-  </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fusion ERP - Verify Your New Email</title>
+  <style>
+    body {
+      background-color: #f1f3f9;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .email-container {
+      max-width: 580px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+
+    .email-header {
+      background: linear-gradient(to right, #3a8ffd, #005bea);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .email-body {
+      padding: 30px 25px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .email-body p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .verification-code {
+      display: inline-block;
+      background: #eef5ff;
+      color: #005bea;
+      font-weight: bold;
+      padding: 14px 24px;
+      font-size: 24px;
+      letter-spacing: 3px;
+      border-radius: 8px;
+      border: 2px dashed #005bea;
+      margin: 20px 0;
+    }
+
+    .email-footer {
+      text-align: center;
+      background: #fafafa;
+      padding: 18px;
+      font-size: 12px;
+      color: #777;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    @media (max-width: 600px) {
+      .email-body, .email-header {
+        padding: 20px;
+      }
+      .verification-code {
+        font-size: 20px;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="email-header">
+      Verify Your New Email - Fusion ERP
+    </div>
+    <div class="email-body">
+      <p>Hello,</p>
+      <p>You have requested to change your email address for your <strong>Fusion ERP</strong> account. To proceed, please use the verification code below:</p>
+
+      <div class="verification-code">{verificationCode}</div>
+
+      <p>If you did not request this change, please ignore this email or contact our support team immediately.</p>
+    </div>
+    <div class="email-footer">
+      &copy; ${new Date().getFullYear()} Fusion ERP. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
 `;
 
 export const Email_Change_Confirmation_Email = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>onePost AI - Email Change Successful</title>
-      <style>
-          body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-              background-color: #f4f4f4;
-              color: #333;
-          }
-          .container {
-              max-width: 600px;
-              margin: 30px auto;
-              background: #ffffff;
-              border-radius: 8px;
-              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-              border: 1px solid #ddd;
-          }
-          .header {
-              background-color: #007BFF;
-              color: white;
-              padding: 20px;
-              text-align: center;
-              font-size: 26px;
-              font-weight: bold;
-          }
-          .content {
-              padding: 25px;
-              line-height: 1.8;
-          }
-          .footer {
-              background-color: #f4f4f4;
-              padding: 15px;
-              text-align: center;
-              color: #777;
-              font-size: 12px;
-              border-top: 1px solid #ddd;
-          }
-          p {
-              margin: 0 0 15px;
-          }
-      </style>
-  </head>
-  <body>
-      <div class="container">
-          <div class="header">onePost AI - Email Change Successful</div>
-          <div class="content">
-              <p>Hello {name},</p>
-              <p>Your email address has been successfully updated. From now on, please use your new email address to log in to your account.</p>
-              <p>If you did not request this change, please contact our support team immediately.</p>
-              <p>Stay secure,</p>
-              <p><strong>onePost AI Team</strong></p>
-          </div>
-          <div class="footer">
-              <p>&copy; ${new Date().getFullYear()} onePost AI. All rights reserved.</p>
-          </div>
-      </div>
-  </body>
-  </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fusion ERP - Email Change Successful</title>
+  <style>
+    body {
+      background-color: #f1f3f9;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .email-container {
+      max-width: 580px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+
+    .email-header {
+      background: linear-gradient(to right, #3a8ffd, #005bea);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .email-body {
+      padding: 30px 25px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .email-body p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .email-footer {
+      text-align: center;
+      background: #fafafa;
+      padding: 18px;
+      font-size: 12px;
+      color: #777;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    @media (max-width: 600px) {
+      .email-body, .email-header {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="email-header">
+      Email Change Successful - Fusion ERP
+    </div>
+    <div class="email-body">
+      <p>Hello {name},</p>
+      <p>Your email address has been successfully updated. From now on, please use your new email address to log in to your account.</p>
+      <p>If you did not request this change, please contact our support team immediately.</p>
+      <p>Stay secure,</p>
+      <p><strong>Fusion ERP Team</strong></p>
+    </div>
+    <div class="email-footer">
+      &copy; ${new Date().getFullYear()} Fusion ERP. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
 `;

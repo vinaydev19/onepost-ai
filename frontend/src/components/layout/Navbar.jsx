@@ -137,7 +137,7 @@ function Navbar() {
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild>
-                                            <Link to="/email-change-verification" className="flex items-center">
+                                            <Link to="/email-change" className="flex cursor-pointer hover:bg-gray-800 items-center">
                                                 <Settings className="mr-2 h-4 w-4" />
                                                 Change Email
                                             </Link>

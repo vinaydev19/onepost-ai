@@ -17,7 +17,6 @@ import EmailChange from './EmailChange'
 import Editor from './Editor'
 import BlogPost from './BlogPost'
 import ChangePassword from './ChangePassword'
-import EmailChangeVerification from './EmailChangeVerification'
 import EmailChangeConfirmation from './EmailChangeConfirmation'
 
 function Body() {
@@ -30,7 +29,6 @@ function Body() {
                 <Route path="verify-otp" element={<VerifyOTP />} />
                 <Route path="password-reset" element={<PasswordReset />} />
                 <Route path="password-change" element={<PasswordChange />} />
-                <Route path="email-change" element={<EmailChange />} />
 
                 <Route path='' element={<ProtectedRoute />}>
                     <Route element={<MainLayout />}>
@@ -41,8 +39,8 @@ function Body() {
                         <Route path='reading-lists' element={<ReadingLists />} />
                         <Route path='write-new-blog' element={<Editor />} />
                         <Route path='change-password' element={<ChangePassword />} />
-                        <Route path="/email-change-verification" element={<EmailChangeVerification />} />
-                        <Route path="/email-change-confirmation" element={<EmailChangeConfirmation />} />
+                        <Route path="email-change" element={<EmailChange />} />
+                        <Route path="email-change-confirmation" element={<EmailChangeConfirmation />} />
                     </Route>
                 </Route>
             </>

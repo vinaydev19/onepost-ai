@@ -5,6 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useLogoutMutation, usePasswordChangeMutation } from "@/redux/api/userApiSlice";
+import toast from "react-hot-toast";
+import { getEmail, getMyProfile, getUser } from "@/redux/features/userSlice";
+import { useDispatch } from "react-redux";
 // import { useToast } from "@/hooks/use-toast";
 
 const ChangePassword = () => {
@@ -18,8 +22,13 @@ const ChangePassword = () => {
         newPassword: false,
         confirmPassword: false,
     });
-    const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch()
+    const [passwordChange, { isLoading }] = usePasswordChangeMutation()
+    const [logoutApi] = useLogoutMutation()
+
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -30,9 +39,34 @@ const ChangePassword = () => {
         setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
     };
 
+    const handleSignOut = async () => {
+        try {
+            const res = await logoutApi().unwrap();
+            dispatch(getUser(null));
+            dispatch(getMyProfile(null));
+            dispatch(getEmail(null));
+            toast.success(res.message)
+            navigate("/login");
+        } catch (error) {
+            console.log(`something want wrong while logout`);
+            console.log(error);
+            toast.error(error.data.message)
+        }
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        try {
+            const res = await passwordChange(formData).unwrap()
+            toast.success(res.message)
+            console.log(res);
+            handleSignOut()
+        } catch (error) {
+            console.log(`something want wrong while change the password`);
+            console.log(error);
+            toast.error(error.data.message)
+        }
     };
 
     return (
