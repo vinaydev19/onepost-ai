@@ -19,11 +19,12 @@ const Editor = () => {
     const [tags, setTags] = useState([]);
     const [currentTag, setCurrentTag] = useState('');
     const [category, setCategory] = useState('');
-    const [isDraft, setIsDraft] = useState(true);
+    const [status, setStatus] = useState("Draft"); // default "Draft"
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [mode, setMode] = useState('write');
     const [wordCount, setWordCount] = useState(0);
     const [lastSaved, setLastSaved] = useState(null);
+    const [featuredImage, setFeaturedImage] = useState(null)
 
     const categories = [
         "Technology", "Programming", "Business", "Finance", "Health", "Fitness",
@@ -31,6 +32,7 @@ const Editor = () => {
         "Movies", "Science", "Environment", "Parenting", "Marketing", "Spirituality",
         "Productivity"
     ];
+
 
     useEffect(() => {
         const textContent = content.replace(/<[^>]*>/g, ' ').trim();
@@ -67,6 +69,30 @@ const Editor = () => {
             minute: '2-digit'
         }).format(date);
     };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFeaturedImage(file);
+        }
+    };
+
+    const removeImage = () => {
+        setFeaturedImage(null);
+    };
+
+    // api calling
+    const submitBlog = async (e) => {
+        e.preventDefault()
+        const payload = {
+            title,
+            content,
+            tags,
+            category,
+            status,
+            featuredImage
+        }
+    }
 
     if (isFullscreen) {
         return (
@@ -170,6 +196,48 @@ const Editor = () => {
                     <div className="lg:col-span-1 space-y-6">
                         <Card>
                             <CardHeader>
+                                <CardTitle className="text-lg">Cover Image</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {!featuredImage ? (
+                                    <div>
+                                        <input
+                                            type="file"
+                                            id="file-upload"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                        />
+                                        <label
+                                            htmlFor="file-upload"
+                                            className="cursor-pointer px-4 py-2 bg-[#6b40e2] text-black rounded-md transition-transform duration-200 hover:scale-105"
+                                        >
+                                            Choose Image
+                                        </label>
+                                    </div>
+                                ) : (
+                                    <div className="relative">
+                                        <img
+                                            src={URL.createObjectURL(featuredImage)}
+                                            alt="Featured Preview"
+                                            className="rounded-md max-h-48 object-cover w-full"
+                                        />
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            className="absolute bottom-2 left-2 bg-[#6b40e2] text-black rounded-md transition-transform duration-200 hover:scale-105 cursor-pointer"
+                                            onClick={removeImage}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
+
+                        <Card>
+                            <CardHeader>
                                 <CardTitle className="text-lg">Publish</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -177,8 +245,8 @@ const Editor = () => {
                                     <label className="switch">
                                         <input
                                             type="checkbox"
-                                            checked={isDraft}
-                                            onChange={(e) => setIsDraft(e.target.checked)}
+                                            checked={status === "Published"}
+                                            onChange={(e) => setStatus(e.target.checked ? "Published" : "Draft")}
                                         />
                                         <span className="slider"></span>
                                     </label>
@@ -186,9 +254,9 @@ const Editor = () => {
                                 </div>
 
                                 <div className="flex gap-2">
-                                    <Button className="flex-1 bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105">
+                                    <Button onClick={submitBlog} className="flex-1 bg-[#6b40e2] hover:cursor-pointer text-black transition-transform duration-200 hover:scale-105">
                                         <Save className="w-4 h-4 mr-2" />
-                                        {isDraft ? 'Save Draft' : 'Publish'}
+                                        {status === "Published" ? "Published" : "Draft"}
                                     </Button>
                                 </div>
                             </CardContent>

@@ -29,7 +29,7 @@ const blogSchema = new mongoose.Schema({
     ], // it like list of image, video, audio that user can upload in blog
     status: {
         type: String,
-        enum: ["Draft", "Published", "Pending Approval"],
+        enum: ["Draft", "Published"],
         default: "Draft",
         index: true
     },
