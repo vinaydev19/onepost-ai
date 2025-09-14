@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEmailConfirmMutation, useLogoutMutation } from "@/redux/api/userApiSlice";
 import { useDispatch } from "react-redux";
-import { getEmail, getMyProfile, getUser } from "@/redux/features/userSlice";
+import { getEmail, getMyProfile, getUser, logout } from "@/redux/features/userSlice";
 import toast from "react-hot-toast";
 
 const EmailChangeConfirmation = () => {
@@ -20,9 +20,7 @@ const EmailChangeConfirmation = () => {
     const handleSignOut = async () => {
         try {
             const res = await logoutApi().unwrap();
-            dispatch(getUser(null));
-            dispatch(getMyProfile(null));
-            dispatch(getEmail(null));
+            dispatch(logout());
             toast.success(res.message)
             navigate("/login");
         } catch (error) {

@@ -8,7 +8,7 @@ import { LogOut, Menu, Search, Settings, User, X } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLogoutMutation } from '@/redux/api/userApiSlice';
-import { getEmail, getMyProfile, getUser } from '@/redux/features/userSlice';
+import { getEmail, getMyProfile, getUser, logout } from '@/redux/features/userSlice';
 import toast from 'react-hot-toast';
 
 function Navbar() {
@@ -41,9 +41,7 @@ function Navbar() {
     const handleSignOut = async () => {
         try {
             const res = await logoutApi().unwrap();
-            dispatch(getUser(null));
-            dispatch(getMyProfile(null));
-            dispatch(getEmail(null));
+            dispatch(logout());
             toast.success(res.message)
             navigate("/login");
         } catch (error) {

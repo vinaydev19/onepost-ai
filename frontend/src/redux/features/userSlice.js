@@ -1,25 +1,31 @@
+// src/redux/features/userSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const userSlice = createSlice({
-    name: "user",
-    initialState: {
-        user: null,
-        profile: null,
-        email: null
+  name: "user",
+  initialState: {
+    user: null,
+    profile: null,
+    email: null
+  },
+  reducers: {
+    getUser: (state, action) => {
+      state.user = action.payload;
     },
-    reducers: {
-        getUser: (state, action) => {
-            state.user = action.payload;
-        },
-        getMyProfile: (state, action) => {
-            state.profile = action.payload;
-        },
-        getEmail: (state, action) => {
-            state.email = action.payload
-        }
+    getMyProfile: (state, action) => {
+      state.profile = action.payload;
     },
+    getEmail: (state, action) => {
+      state.email = action.payload;
+    },
+    logout: (state) => {  
+      state.user = null;
+      state.profile = null;
+      state.email = null;
+    }
+  },
 });
 
-export const { getUser, getMyProfile, getEmail } = userSlice.actions;
+export const { getUser, getMyProfile, getEmail, logout } = userSlice.actions;
 
 export default userSlice.reducer;

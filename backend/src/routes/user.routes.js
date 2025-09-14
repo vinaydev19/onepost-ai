@@ -34,7 +34,7 @@ router.post('/password/reset', resetPassword);
 
 // Authenticated User Routes
 router.post('/logout', verifyJWT, userLogout);
-router.post('/refresh-token', verifyJWT, refreshAccessToken);
+router.post('/refresh-token', refreshAccessToken);
 router.post('/google-login', verifyJWT, loginWithGoogle);
 
 // User Profile & Account Routes

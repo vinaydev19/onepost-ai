@@ -7,7 +7,7 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogoutMutation, usePasswordChangeMutation } from "@/redux/api/userApiSlice";
 import toast from "react-hot-toast";
-import { getEmail, getMyProfile, getUser } from "@/redux/features/userSlice";
+import { getEmail, getMyProfile, getUser, logout } from "@/redux/features/userSlice";
 import { useDispatch } from "react-redux";
 // import { useToast } from "@/hooks/use-toast";
 
@@ -42,9 +42,7 @@ const ChangePassword = () => {
     const handleSignOut = async () => {
         try {
             const res = await logoutApi().unwrap();
-            dispatch(getUser(null));
-            dispatch(getMyProfile(null));
-            dispatch(getEmail(null));
+            dispatch(logout());
             toast.success(res.message)
             navigate("/login");
         } catch (error) {

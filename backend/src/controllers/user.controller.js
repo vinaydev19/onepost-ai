@@ -9,11 +9,22 @@ import axios from "axios"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { Mongoose } from "mongoose"
 
-const options = {
+const isProd = process.env.NODE_ENV === "production";
+
+const accessCookieOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     path: "/",
+    maxAge: 15 * 60 * 1000, // 15 minutes
+};
+
+const refreshCookieOptions = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days (adjust as needed)
 };
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -163,8 +174,8 @@ const userLogin = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, accessCookieOptions)
+        .cookie("refreshToken", refreshToken, refreshCookieOptions)
         .json(
             new ApiResponse(
                 200,
@@ -182,31 +193,22 @@ const userLogout = asyncHandler(async (req, resp) => {
         { new: true }
     );
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-    };
-
     return resp
         .status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
+        .clearCookie("accessToken", accessCookieOptions)
+        .clearCookie("refreshToken", refreshCookieOptions)
         .json(new ApiResponse(200, {}, "user logout successfully"));
 });
 
 const refreshAccessToken = asyncHandler(async (req, resp) => {
-    const incomingRefreshToken =
-        req.cookies.refreshToken || req.body.refreshToken;
+    const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
     if (!incomingRefreshToken) {
         throw new ApiError(401, "unauthorized request");
     }
 
     try {
-        const decodedToken = jwt.verify(
-            incomingRefreshToken,
-            process.env.REFRESH_TOKEN_SECRET
-        );
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
 
         const user = await User.findById(decodedToken?._id);
 
@@ -218,22 +220,18 @@ const refreshAccessToken = asyncHandler(async (req, resp) => {
             throw new ApiError(401, "refresh Token is expired or used");
         }
 
-        const { accessToken, newRefreshToken } =
-            await generateAccessAndRefreshToken(user._id);
+        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id);
 
         return resp
             .status(200)
-            .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", newRefreshToken, options)
-            .json(
-                200,
-                { accessToken, refreshToken: newRefreshToken },
-                "access token refreshed"
-            );
+            .cookie("accessToken", accessToken, accessCookieOptions)
+            .cookie("refreshToken", newRefreshToken, refreshCookieOptions)
+            .json(new ApiResponse(200, { accessToken, refreshToken: newRefreshToken }, "access token refreshed"));
     } catch (error) {
         throw new ApiError(401, error?.message || "invalid refresh token");
     }
 });
+
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user).select("-password -refreshToken");
@@ -391,8 +389,8 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, accessCookieOptions)
+        .cookie("refreshToken", refreshToken, refreshCookieOptions)
         .json(
             new ApiResponse(200, { user, accessToken, refreshToken }, "Logged in successfully with Google")
         );
@@ -518,7 +516,7 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
     }
 
     console.log(req.user?._id);
-    
+
 
     const user = await User.aggregate([
         {
