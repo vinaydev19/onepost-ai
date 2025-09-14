@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tiptap } from '@/components/common/Tiptap';
+import { useCreateBlogMutation } from '@/redux/api/blogApiSlice';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Editor = () => {
     const [title, setTitle] = useState('');
@@ -19,12 +22,14 @@ const Editor = () => {
     const [tags, setTags] = useState([]);
     const [currentTag, setCurrentTag] = useState('');
     const [category, setCategory] = useState('');
-    const [status, setStatus] = useState("Draft"); // default "Draft"
+    const [status, setStatus] = useState("Draft");
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [mode, setMode] = useState('write');
     const [wordCount, setWordCount] = useState(0);
     const [lastSaved, setLastSaved] = useState(null);
     const [featuredImage, setFeaturedImage] = useState(null)
+    const [createblog, { isLoading }] = useCreateBlogMutation()
+    const navigate = useNavigate();
 
     const categories = [
         "Technology", "Programming", "Business", "Finance", "Health", "Fitness",
@@ -83,16 +88,34 @@ const Editor = () => {
 
     // api calling
     const submitBlog = async (e) => {
-        e.preventDefault()
-        const payload = {
-            title,
-            content,
-            tags,
-            category,
-            status,
-            featuredImage
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("status", status);
+        formData.append("category", category);
+        tags.forEach(tag => formData.append("tags", tag));
+        if (featuredImage) {
+            formData.append("featuredImage", featuredImage);
         }
-    }
+        // files.forEach(file => formData.append("files", file));
+
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        try {
+            const res = await createblog(formData).unwrap();
+            toast.success(res.message);
+            console.log(res);
+            navigate(`/blog/${res.data.blog.slug}`)
+        } catch (error) {
+            console.error("❌ Blog creation failed:", error);
+            toast.error(error?.data?.message || "Something went wrong");
+        }
+    };
+
 
     if (isFullscreen) {
         return (
@@ -275,7 +298,7 @@ const Editor = () => {
                                         </SelectTrigger>
                                         <SelectContent className='text-white bg-[#020817]'>
                                             {categories.map((cat) => (
-                                                <SelectItem key={cat} value={cat.toLowerCase()}>
+                                                <SelectItem key={cat} value={cat}>
                                                     {cat}
                                                 </SelectItem>
                                             ))}

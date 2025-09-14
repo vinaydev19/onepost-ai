@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { useToggleBlogLikeMutation } from '@/redux/api/likesApiSlice';
 import { CommentModal } from './CommentModel';
 import { useSelector } from 'react-redux';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 // Mock comments data
 export const mockComments = [
@@ -61,7 +62,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
     const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
     const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
     const currentUser = useSelector((state) => state.user.user);
-
+    const isOwner = currentUser?.username === post?.author?.username;
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -82,6 +83,17 @@ function BlogCard({ post, variant = "card", showImage = true }) {
             toast.error(error?.data?.message || "Something went wrong while liking")
         }
     }
+
+    const handleEdit = () => {
+        // Navigate to edit page
+        // e.g., navigate(`/blog/edit/${post.slug}`)
+        console.log("Edit clicked");
+    };
+
+    const handleDelete = () => {
+        // Call API or dispatch Redux action to delete
+        console.log("Delete clicked");
+    };
 
     if (variant === "list") {
         return (
@@ -239,9 +251,23 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                             <Bookmark className={`h-4 w-4 ${post?.isBookmarked ? "fill-current" : ""}`} />
                         </Button> */}
 
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer hover:text-white">
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        {isOwner && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer hover:text-white"
+                                    >
+                                        <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="bg-[#020817] text-white">
+                                    <DropdownMenuItem className='cursor-pointer hover:bg-gray-800 items-center' onClick={handleEdit}>Edit</DropdownMenuItem>
+                                    <DropdownMenuItem className='cursor-pointer hover:bg-gray-800 items-center' onClick={handleDelete}>Delete</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
                 </div>
             </CardContent>

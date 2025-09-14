@@ -13,6 +13,9 @@ import { useAccountUpdateMutation, useGetUserProfileQuery, useProfilePictureMuta
 import toast from "react-hot-toast";
 import { LoaderTwo } from "@/components/ui/loader";
 import { useToggleFollowMutation } from "@/redux/api/followApiSlice";
+import { useGetBlogsByAuthorQuery } from "@/redux/api/blogApiSlice";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BlogCard from "@/components/common/BlogCard";
 
 export default function Profile() {
   const { username } = useParams();
@@ -31,7 +34,14 @@ export default function Profile() {
   const [accountUpdate, { isLoadingAsAccountUpdate }] = useAccountUpdateMutation()
   const [profilePicture] = useProfilePictureMutation();
   const [toggleFollow, { isLoading: isFollowLoading }] = useToggleFollowMutation();
-  
+  const { data: blogsData, isLoading: blogsLoading } = useGetBlogsByAuthorQuery(username);
+  const [activeTab, setActiveTab] = useState("published");
+
+  const publishedBlogs = blogsData?.data.blogs.filter(blog => blog.status === "Published") || [];
+  const draftBlogs = blogsData?.data.blogs.filter(blog => blog.status === "Draft") || [];
+  const likedBlogs = [];
+  const readingList = [];
+
   useEffect(() => {
     if (data) {
       setProfileUser({
@@ -54,6 +64,10 @@ export default function Profile() {
       });
     }
   }, [data, username, currentUser]);
+
+  const NoBlogsMessage = ({ message }) => (
+    <p className="text-gray-400 text-center py-6">{message}</p>
+  );
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -112,7 +126,7 @@ export default function Profile() {
   const handleToggleFollow = async () => {
     try {
       const res = await toggleFollow(data?.data._id).unwrap(); // pass userId
-      toast.success(res.message || "Updated follow status");      
+      toast.success(res.message || "Updated follow status");
 
       setProfileUser((prev) => ({
         ...prev,
@@ -228,6 +242,105 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="max-w-4xl mx-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList
+              className={`w-full bg-[#1e293b] text-white 
+            ${profileUser.isOwnProfile ? "grid grid-cols-4" : "flex justify-start"}`}
+            >
+              <TabsTrigger
+                value="published"
+                className="data-[state=active]:bg-[#6c46e2] data-[state=active]:text-white"
+              >
+                Published
+              </TabsTrigger>
+
+              {profileUser.isOwnProfile && (
+                <>
+                  <TabsTrigger
+                    value="liked"
+                    className="data-[state=active]:bg-[#6c46e2] data-[state=active]:text-white"
+                  >
+                    Liked
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="reading"
+                    className="data-[state=active]:bg-[#6c46e2] data-[state=active]:text-white"
+                  >
+                    Reading Lists
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="drafts"
+                    className="data-[state=active]:bg-[#6c46e2] data-[state=active]:text-white"
+                  >
+                    Drafts
+                  </TabsTrigger>
+                </>
+              )}
+            </TabsList>
+
+            {/* Published Blogs */}
+            <TabsContent value="published" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {blogsLoading ? (
+                  <p className="text-gray-400">Loading blogs...</p>
+                ) : publishedBlogs.length > 0 ? (
+                  publishedBlogs.map((post) => (
+                    <BlogCard key={post._id} post={post} variant="card" />
+                  ))
+                ) : (
+                  <NoBlogsMessage message="No published blogs yet." />
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Drafts */}
+            <TabsContent value="drafts" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {draftBlogs.length > 0 ? (
+                  draftBlogs.map((post) => (
+                    <BlogCard key={post._id} post={post} variant="card" />
+                  ))
+                ) : (
+                  <NoBlogsMessage message="You have no drafts." />
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Liked Blogs */}
+            {profileUser.isOwnProfile && (
+              <TabsContent value="liked" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {likedBlogs.length > 0 ? (
+                    likedBlogs.map((post) => (
+                      <BlogCard key={post._id} post={post} variant="card" />
+                    ))
+                  ) : (
+                    <NoBlogsMessage message="You haven’t liked any blogs yet." />
+                  )}
+                </div>
+              </TabsContent>
+            )}
+
+
+            {/* Reading List */}
+            {profileUser.isOwnProfile && (
+              <TabsContent value="reading" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {readingList.length > 0 ? (
+                    readingList.map((post) => (
+                      <BlogCard key={post._id} post={post} variant="card" />
+                    ))
+                  ) : (
+                    <NoBlogsMessage message="Your reading list is empty." />
+                  )}
+                </div>
+              </TabsContent>
+            )}
+
+          </Tabs>
         </div>
       </div>
 

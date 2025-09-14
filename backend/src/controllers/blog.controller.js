@@ -8,9 +8,24 @@ import { User } from "../models/user.model.js"
 const createBlog = asyncHandler(async (req, res) => {
     const { title, content, status, category, tags } = req.body
 
-    if ([title, content, status, category, tags].some((field) => !field || field.trim() === "")) {
-        throw new ApiError(400, "all field are required")
+    console.log([title, content, status, category, tags]);
+
+
+    if (
+        [title, content, status, category, tags].some((field) => {
+            if (typeof field === "string") {
+                return field.trim() === "";
+            }
+            if (Array.isArray(field)) {
+                return field.length === 0;
+            }
+            return !field;
+        })
+    ) {
+        throw new ApiError(400, "all fields are required");
     }
+
+    console.log('file', req.files);
 
     const featuredImageLocalPath = req.files?.featuredImage[0].path
     const featuredImage = await uploadOnCloudinary(featuredImageLocalPath)
@@ -388,20 +403,148 @@ const getOneBlog = asyncHandler(async (req, res) => {
 })
 
 const getAllBlogByAuthor = asyncHandler(async (req, res) => {
-    const username = req.params.username
+    const username = req.params.username;
 
-    const BlogsByAuthor = await User.findOne({ username })
-
-    if (!BlogsByAuthor) {
+    // Find the author by username
+    const author = await User.findOne({ username });
+    if (!author) {
         throw new ApiError(404, "User not found");
     }
 
-    const blogs = await Blog.find({ author: BlogsByAuthor._id })
+    const blogs = await Blog.aggregate([
+        {
+            $match: { author: author._id }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        },
+        { $unwind: "$author" },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "Blog",
+                as: "likes"
+            }
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "Blog",
+                as: "comments",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "commentedBy",
+                            foreignField: "_id",
+                            as: "commentedByUser",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        username: 1,
+                                        profilePic: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    { $unwind: "$commentedByUser" },
+                    {
+                        $lookup: {
+                            from: "likes",
+                            localField: "_id",
+                            foreignField: "comment",
+                            as: "likes"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            likesCount: { $size: "$likes" },
+                            isLiked: {
+                                $cond: {
+                                    if: { $in: [{ $toObjectId: req.user?._id }, "$likes.likedBy"] },
+                                    then: true,
+                                    else: false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            content: 1,
+                            commentedBy: 1,
+                            commentedByUser: 1,
+                            createdAt: 1,
+                            likesCount: 1,
+                            isLiked: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                likesCount: { $size: "$likes" },
+                commentsCount: { $size: "$comments" },
+                isLiked: {
+                    $cond: {
+                        if: { $in: [{ $toObjectId: req.user?._id }, "$likes.likedBy"] },
+                        then: true,
+                        else: false
+                    }
+                },
+                canEdit: {
+                    $cond: {
+                        if: { $eq: [req.user?._id, "$author._id"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                author: 1,
+                title: 1,
+                slug: 1,
+                content: 1,
+                featuredImage: 1,
+                files: 1,
+                status: 1,
+                category: 1,
+                tags: 1,
+                likesCount: 1,
+                commentsCount: 1,
+                isLiked: 1,
+                canEdit: 1,
+                comments: {
+                    _id: 1,
+                    content: 1,
+                    commentedBy: 1,
+                    commentedByUser: 1,
+                    likesCount: 1,
+                    isLiked: 1,
+                    createdAt: 1
+                },
+                createdAt: 1,
+                updatedAt: 1
+            }
+        }
+    ]);
 
     return res
         .status(200)
         .json(new ApiResponse(200, { blogs }, `Blogs by ${username} fetched successfully`));
 });
+
 
 const updateBlog = asyncHandler(async (req, res) => {
     const id = req.params.id;
