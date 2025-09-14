@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { MoreVertical, Edit, Trash2, Heart, MessageCircle, Bookmark, Share2, Twitter, Facebook, Link as LinkIcon, UserPlus } from "lucide-react";
+import { MoreVertical, Edit, Trash2, Heart, MessageCircle, Bookmark, Share2, Twitter, Facebook, Link as LinkIcon, UserPlus, Trash2Icon, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useGetBlogBySlugQuery } from '@/redux/api/blogApiSlice';
+import { useDeleteBlogMutation, useGetBlogBySlugQuery } from '@/redux/api/blogApiSlice';
 import { useState } from 'react';
 import { useToggleBlogLikeMutation, useToggleCommentLikeMutation } from '@/redux/api/likesApiSlice';
 import toast from 'react-hot-toast';
@@ -20,8 +20,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 function BlogPost() {
     const { slug } = useParams();
@@ -34,6 +33,10 @@ function BlogPost() {
     const [editingComment, setEditingComment] = useState(null);
     const currentUser = useSelector((state) => state.user.user);
     const [deleteComment, { isLoading: isDeleting }] = useDeleteCommentMutation();
+    const [deleteBlog, { isLoading: isDeletingBlog }] = useDeleteBlogMutation();
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         if (data?.data?.oneBlog[0]) {
@@ -82,7 +85,6 @@ function BlogPost() {
         }
     };
 
-
     const toggleLikeComment = async (commentId) => {
         try {
             const res = await toggleCommentLike(commentId).unwrap();
@@ -92,6 +94,18 @@ function BlogPost() {
             toast.error(error?.data?.message || "Something went wrong while liking comment");
         }
     }
+
+    const handleDeleteBlog = async () => {
+        try {
+            const res = await deleteBlog(Blog._id).unwrap();
+            toast.success(res.message || "Blog deleted successfully");
+            navigate(`/profile/${currentUser.username}`); // redirect to profile
+        } catch (error) {
+            console.error("Error deleting blog:", error);
+            toast.error(error?.data?.message || "Something went wrong while deleting blog");
+        }
+    };
+
 
     if (isLoading) {
         return (
@@ -141,16 +155,18 @@ function BlogPost() {
                 {/* Action Bar */}
                 <div className="flex items-center justify-between py-4 border-y border-border mb-8 animate-slide-up">
                     <div className="flex items-center gap-4">
+                        {/* Like */}
                         <Button
                             variant="ghost"
                             size="sm"
-                            className={`gap-2 text-gray-400  hover:text-red-500 hover:bg-[#1e293b]  hover:cursor-pointer ${Blog?.isLiked ? "text-red-500" : ""}`}
+                            className={`gap-2 text-gray-400 hover:text-red-500 hover:bg-[#1e293b] hover:cursor-pointer ${Blog?.isLiked ? "text-red-500" : ""}`}
                             onClick={toggleLike}
                         >
                             <Heart className={`h-4 w-4 mr-1 ${Blog?.isLiked ? "fill-current" : ""}`} />
                             {Blog?.likesCount}
                         </Button>
 
+                        {/* Comment */}
                         <Button
                             variant="ghost"
                             size="sm"
@@ -162,34 +178,44 @@ function BlogPost() {
                         </Button>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        {/* <Button
-                            variant="ghost"
-                            size="icon"
-                            className={cn(
-                                "text-gray-400 hover:text-primary",
-                                Blog?.isBookmarked && "text-primary"
-                            )}
-                        >
-                            <Bookmark className={cn("h-5 w-5", Blog?.isBookmarked && "fill-current")} />
-                        </Button> */}
+                    <div className="flex items-center">
+                        {/* Share buttons */}
+                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-primary">
+                            <Share2 className="h-5 w-5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-blue-500">
+                            <Twitter className="h-5 w-5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-blue-600">
+                            <Facebook className="h-5 w-5" />
+                        </Button>
 
-                        <div className="flex items-center">
-                            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-primary">
-                                <Share2 className="h-5 w-5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-blue-500">
-                                <Twitter className="h-5 w-5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-blue-600">
-                                <Facebook className="h-5 w-5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-primary">
-                                <LinkIcon className="h-5 w-5" />
-                            </Button>
-                        </div>
+                        {/* Separator + Owner controls */}
+                        {currentUser?._id === Blog?.author?._id && (
+                            <>
+                                <Separator orientation="vertical" className="h-6 bg-gray-700 mx-2" />
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => navigate(`/blog/edit/${Blog._id}`)}
+                                    className="text-gray-400 hover:text-blue-500"
+                                >
+                                    <Edit className="h-5 w-5" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setIsConfirmOpen(true)}
+                                    disabled={isDeletingBlog}
+                                    className="text-gray-400 hover:text-red-500"
+                                >
+                                    <Trash2 className="h-5 w-5" />
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
+
 
                 {/* Content */}
                 <div className="prose prose-lg max-w-none mb-12 animate-fade-in">
@@ -308,6 +334,14 @@ function BlogPost() {
                     postId={Blog?.slug}
                     currentUser={currentUser}
                     editingComment={editingComment}
+                />
+
+                <ConfirmDialog
+                    open={isConfirmOpen}
+                    onClose={() => setIsConfirmOpen(false)}
+                    onConfirm={handleDeleteBlog}
+                    title="Delete Blog"
+                    description="Are you sure you want to delete this blog? This action cannot be undone."
                 />
             </article>
         </div>

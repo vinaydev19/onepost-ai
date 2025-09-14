@@ -10,59 +10,16 @@ import { useToggleBlogLikeMutation } from '@/redux/api/likesApiSlice';
 import { CommentModal } from './CommentModel';
 import { useSelector } from 'react-redux';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-
-// Mock comments data
-export const mockComments = [
-    {
-        id: "c1",
-        author: {
-            name: "Alice Johnson",
-            avatar: "https://i.pravatar.cc/100?img=1",
-            username: "alicej",
-        },
-        content: "This is a really insightful post! Thanks for sharing 🙌",
-        publishedAt: "2025-08-20T12:30:00Z",
-        likes: 5,
-        isLiked: true,
-    },
-    {
-        id: "c2",
-        author: {
-            name: "Bob Smith",
-            avatar: "https://i.pravatar.cc/100?img=2",
-            username: "bobsmith",
-        },
-        content: "I completely agree with your points, especially about scalability.",
-        publishedAt: "2025-08-21T09:15:00Z",
-        likes: 2,
-        isLiked: false,
-    },
-    {
-        id: "c3",
-        author: {
-            name: "Charlie Kim",
-            avatar: "https://i.pravatar.cc/100?img=3",
-            username: "charliek",
-        },
-        content: "Can you expand more on the database optimization part?",
-        publishedAt: "2025-08-23T18:45:00Z",
-        likes: 0,
-        isLiked: false,
-    },
-];
-
-// Mock current user
-export const mockCurrentUser = {
-    name: "You",
-    avatar: "https://i.pravatar.cc/100?img=4",
-};
-
+import { useDeleteBlogMutation } from '@/redux/api/blogApiSlice';
+import { ConfirmDialog } from './ConfirmDialog';
 
 function BlogCard({ post, variant = "card", showImage = true }) {
     const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
     const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
     const currentUser = useSelector((state) => state.user.user);
     const isOwner = currentUser?.username === post?.author?.username;
+    const [deleteBlog, { isLoading: isDeleting }] = useDeleteBlogMutation();
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -90,10 +47,17 @@ function BlogCard({ post, variant = "card", showImage = true }) {
         console.log("Edit clicked");
     };
 
-    const handleDelete = () => {
-        // Call API or dispatch Redux action to delete
-        console.log("Delete clicked");
+    const handleDelete = async () => {
+        try {
+            const res = await deleteBlog(post._id).unwrap();
+            toast.success(res.message || "Blog deleted successfully");
+            setIsConfirmOpen(false);
+        } catch (error) {
+            console.error("Error deleting blog:", error);
+            toast.error(error?.data?.message || "Something went wrong while deleting");
+        }
     };
+
 
     if (variant === "list") {
         return (
@@ -163,9 +127,34 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                                         <Bookmark className={`h-4 w-4 ${post?.isBookmarked ? "fill-current" : ""}`} />
                                     </Button> */}
 
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer hover:text-white">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
+                                    {isOwner && (
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-gray-400 hover:bg-[#1e293b] hover:cursor-pointer hover:text-white"
+                                                >
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="bg-[#020817] text-white">
+                                                <DropdownMenuItem
+                                                    className="cursor-pointer hover:bg-gray-800 items-center"
+                                                    onClick={handleEdit}
+                                                >
+                                                    Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="cursor-pointer hover:bg-gray-800 items-center text-red-500"
+                                                    onClick={() => setIsConfirmOpen(true)}
+                                                    disabled={isDeleting}
+                                                >
+                                                    {isDeleting ? "Deleting..." : "Delete"}
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -263,8 +252,19 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="bg-[#020817] text-white">
-                                    <DropdownMenuItem className='cursor-pointer hover:bg-gray-800 items-center' onClick={handleEdit}>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem className='cursor-pointer hover:bg-gray-800 items-center' onClick={handleDelete}>Delete</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer hover:bg-gray-800 items-center"
+                                        onClick={handleEdit}
+                                    >
+                                        Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer hover:bg-gray-800 items-center text-red-500"
+                                        onClick={() => setIsConfirmOpen(true)}
+                                        disabled={isDeleting}
+                                    >
+                                        {isDeleting ? "Deleting..." : "Delete"}
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         )}
@@ -277,6 +277,14 @@ function BlogCard({ post, variant = "card", showImage = true }) {
                 onClose={() => setIsCommentModalOpen(false)}
                 postId={post?.slug}
                 currentUser={currentUser}
+            />
+
+            <ConfirmDialog
+                open={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleDelete}
+                title="Delete Blog"
+                description="Are you sure you want to delete this blog? This action cannot be undone."
             />
         </Card>
     );
