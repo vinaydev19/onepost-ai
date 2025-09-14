@@ -8,9 +8,6 @@ import { User } from "../models/user.model.js"
 const createBlog = asyncHandler(async (req, res) => {
     const { title, content, status, category, tags } = req.body
 
-    console.log([title, content, status, category, tags]);
-
-
     if (
         [title, content, status, category, tags].some((field) => {
             if (typeof field === "string") {
@@ -24,8 +21,6 @@ const createBlog = asyncHandler(async (req, res) => {
     ) {
         throw new ApiError(400, "all fields are required");
     }
-
-    console.log('file', req.files);
 
     const featuredImageLocalPath = req.files?.featuredImage[0].path
     const featuredImage = await uploadOnCloudinary(featuredImageLocalPath)

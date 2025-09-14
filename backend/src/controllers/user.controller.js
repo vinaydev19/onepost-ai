@@ -515,9 +515,6 @@ const getBloggerProfile = asyncHandler(async (req, res) => {
         throw new ApiError(400, "username is required")
     }
 
-    console.log(req.user?._id);
-
-
     const user = await User.aggregate([
         {
             $match: {

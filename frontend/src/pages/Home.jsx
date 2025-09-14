@@ -4,8 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Filter, Grid, List } from 'lucide-react';
 import BlogCard from '@/components/common/BlogCard';
 import { useGetAllBlogsQuery } from '@/redux/api/blogApiSlice';
-import { all } from 'axios';
-
 
 const blogCategories = [
     "All",
@@ -30,7 +28,6 @@ const blogCategories = [
     "Spirituality",
     "Productivity"
 ];
-
 
 function Home() {
     const [viewMode, setViewMode] = useState("card")
@@ -127,7 +124,6 @@ function Home() {
                             style={{ animationDelay: `${index * 0.1}s` }}
                         >
                             <BlogCard post={post} variant={viewMode} />
-                            {/* {console.log(post, "post")} */}
                         </div>
                     ))}
                 </div>

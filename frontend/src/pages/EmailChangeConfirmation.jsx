@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEmailConfirmMutation, useLogoutMutation } from "@/redux/api/userApiSlice";
 import { useDispatch } from "react-redux";
-import { getEmail, getMyProfile, getUser, logout } from "@/redux/features/userSlice";
+import { logout } from "@/redux/features/userSlice";
 import toast from "react-hot-toast";
 
 const EmailChangeConfirmation = () => {
@@ -36,7 +36,6 @@ const EmailChangeConfirmation = () => {
         try {
             const res = await emailConfirm({ code }).unwrap()
             toast.success(res.message)
-            console.log(res);
             handleSignOut()
         } catch (error) {
             console.log(`something want wrong while change the password`);

@@ -71,37 +71,8 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     }
 })
 
-const getBlogLikes = asyncHandler(async (req, res) => {
-    const { slug } = req.params;
-
-    const blog = await Blog.findOne({ slug });
-    if (!blog) {
-        throw new ApiError(404, "Blog not found");
-    }
-
-    const likes = await Like.find({ Blog: blog._id }).populate("likedBy", "username email");
-
-    return res.status(200).json(new ApiResponse(200, { count: likes.length, likes }, "Blog likes fetched"));
-});
-
-const getCommentLikes = asyncHandler(async (req, res) => {
-    const { commentId } = req.params;
-
-    const comment = await Comment.findById(commentId);
-    if (!comment) {
-        throw new ApiError(404, "Comment not found");
-    }
-
-    const likes = await Like.find({ comment: commentId }).populate("likedBy", "username email");
-
-    return res.status(200).json(new ApiResponse(200, { count: likes.length, likes }, "Comment likes fetched"));
-});
-
-
 export {
     toggleCommentLike,
-    toggleBlogLike,
-    getBlogLikes,
-    getCommentLikes
+    toggleBlogLike
 }
 

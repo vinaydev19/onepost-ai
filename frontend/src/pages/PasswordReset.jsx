@@ -42,7 +42,6 @@ function PasswordReset() {
         confirmPassword: formData.confirmPassword,
       }).unwrap()
       toast.success(res.message)
-      console.log(res);
       navigate('/login')
     } catch (error) {
       console.log(`something want wrong while forgot password`);

@@ -26,7 +26,6 @@ function VerifyOTP() {
     try {
       const res = await verify({ code: otp }).unwrap()
       toast.success(res.message)
-      console.log(res);
       dispatch(getEmail(null))
       navigate('/login')
     } catch (error) {
@@ -38,9 +37,6 @@ function VerifyOTP() {
 
   const resetOTP = async (e) => {
     e.preventDefault();
-
-    console.log(email);
-
     try {
       const res = await resendVerification({ email: email }).unwrap()
       toast.success(res.message)

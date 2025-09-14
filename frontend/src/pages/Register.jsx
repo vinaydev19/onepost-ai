@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Check, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from 'react-router-dom'
 import toast from "react-hot-toast";
-import { LoaderOne, LoaderTwo } from '@/components/ui/loader'
+import { LoaderTwo } from '@/components/ui/loader'
 import { useRegisterMutation } from '@/redux/api/userApiSlice'
 
 
@@ -38,7 +38,6 @@ function Register() {
     try {
       const res = await register(formData).unwrap()
       toast.success(res.message)
-      console.log(res);
       navigate('/verify-otp')
     } catch (error) {
       console.log(`something want wrong while register`);

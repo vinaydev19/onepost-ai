@@ -2,11 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useEmailChangeMutation, useLogoutMutation } from '@/redux/api/userApiSlice';
-import { ArrowLeft, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { useEmailChangeMutation } from '@/redux/api/userApiSlice';
+import { ArrowLeft, Mail } from 'lucide-react';
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
-import { useDispatch, useSelector } from 'react-redux';
+import {  useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
 function EmailChange() {
@@ -30,7 +30,6 @@ function EmailChange() {
     try {
       const res = await emailChange(formData).unwrap()
       toast.success(res.message)
-      console.log(res);
       navigate("/email-change-confirmation");
     } catch (error) {
       console.log(`something want wrong while change the password`);

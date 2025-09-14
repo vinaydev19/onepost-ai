@@ -5,8 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { MoreVertical, Edit, Trash2, Heart, MessageCircle, Bookmark, Share2, Twitter, Facebook, Link as LinkIcon, UserPlus, Trash2Icon, Edit2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { MoreVertical, Edit, Trash2, Heart, MessageCircle, Share2, Twitter, Facebook, } from "lucide-react";
 import { useDeleteBlogMutation, useGetBlogBySlugQuery } from '@/redux/api/blogApiSlice';
 import { useState } from 'react';
 import { useToggleBlogLikeMutation, useToggleCommentLikeMutation } from '@/redux/api/likesApiSlice';
@@ -36,9 +35,6 @@ function BlogPost() {
     const [deleteBlog, { isLoading: isDeletingBlog }] = useDeleteBlogMutation();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const navigate = useNavigate();
-
-    console.log(Blog);
-    
 
     useEffect(() => {
         if (data?.data?.oneBlog[0]) {

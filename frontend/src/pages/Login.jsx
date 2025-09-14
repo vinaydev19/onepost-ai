@@ -4,9 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardDescription, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { PenTool, Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from 'react-router-dom'
 import { useLoginMutation } from '@/redux/api/userApiSlice'
 import { LoaderTwo } from '@/components/ui/loader'
 import toast from 'react-hot-toast'
@@ -33,7 +32,6 @@ function Login() {
         try {
             const res = await login(formData).unwrap()
             toast.success(res.message)
-            console.log(res);
             navigate('/')
         } catch (error) {
             console.log(`something want wrong while login`);

@@ -20,7 +20,6 @@ function ForgotPassword() {
         try {
             const res = await resetToken({email}).unwrap()
             toast.success(res.message)
-            console.log(res);
             navigate('/password-reset')
         } catch (error) {
             console.log(`something want wrong while forgot password`);

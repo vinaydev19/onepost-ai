@@ -26,7 +26,6 @@ import followRouter from "./routes/follow.routes.js"
 import readingListRouter from "./routes/readingList.routes.js"
 
 
-
 // use router
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/blogs", blogRouter);
@@ -38,7 +37,6 @@ app.use("/api/v1/readingLists", readingListRouter);
 
 // error handler
 app.use(errorHandler)
-
 
 
 export { app }

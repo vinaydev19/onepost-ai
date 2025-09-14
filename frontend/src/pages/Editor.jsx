@@ -46,9 +46,6 @@ const Editor = ({ isEditing }) => {
         "Productivity"
     ];
 
-    console.log(blog);
-
-
     useEffect(() => {
         const fetchedBlog = blog?.data?.oneBlog?.[0];
         if (fetchedBlog) {
@@ -127,7 +124,6 @@ const Editor = ({ isEditing }) => {
         if (featuredImage) {
             formData.append("featuredImage", featuredImage);
         }
-        console.log([blogData._id, formData]);
 
         try {
             if (isEditing && blogData?._id) {

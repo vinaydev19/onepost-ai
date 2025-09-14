@@ -5,13 +5,9 @@ import { optionalVerifyJWT } from '../middlewares/optionalVerifyJWT.middleware.j
 
 const router = Router();
 
-// Route to get all comments for a blog
 router.get("/get-comments/:slug", optionalVerifyJWT, getAllComments);
-// Route to create a new comment
 router.post("/create-comment/:slug", verifyJWT, addComment);
-// Route to update a comment by ID
 router.put("/update-comment/:commentId", verifyJWT, updateComment);
-// Route to delete a comment by ID
 router.delete("/delete-comment/:commentId", verifyJWT, deleteComment);
 
 export default router;
