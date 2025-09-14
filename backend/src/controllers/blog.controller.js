@@ -545,7 +545,6 @@ const getAllBlogByAuthor = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { blogs }, `Blogs by ${username} fetched successfully`));
 });
 
-
 const updateBlog = asyncHandler(async (req, res) => {
     const id = req.params.id;
 

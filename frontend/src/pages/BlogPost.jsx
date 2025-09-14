@@ -37,6 +37,8 @@ function BlogPost() {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const navigate = useNavigate();
 
+    console.log(Blog);
+    
 
     useEffect(() => {
         if (data?.data?.oneBlog[0]) {
@@ -106,6 +108,9 @@ function BlogPost() {
         }
     };
 
+    const handleEditBlog = () => {
+        navigate(`/blog/edit/${Blog.slug}`);
+    };
 
     if (isLoading) {
         return (
@@ -191,13 +196,13 @@ function BlogPost() {
                         </Button>
 
                         {/* Separator + Owner controls */}
-                        {currentUser?._id === Blog?.author?._id && (
+                        {Blog?.canEdit && (
                             <>
                                 <Separator orientation="vertical" className="h-6 bg-gray-700 mx-2" />
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() => navigate(`/blog/edit/${Blog._id}`)}
+                                    onClick={handleEditBlog}
                                     className="text-gray-400 hover:text-blue-500"
                                 >
                                     <Edit className="h-5 w-5" />

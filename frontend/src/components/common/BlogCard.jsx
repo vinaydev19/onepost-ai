@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Card, CardContent } from '../ui/card';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -17,9 +17,10 @@ function BlogCard({ post, variant = "card", showImage = true }) {
     const [toggleBlogLike, { isLoading: isLiking }] = useToggleBlogLikeMutation()
     const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
     const currentUser = useSelector((state) => state.user.user);
-    const isOwner = currentUser?.username === post?.author?.username;
+    const isOwner = post?.canEdit
     const [deleteBlog, { isLoading: isDeleting }] = useDeleteBlogMutation();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const navigate = useNavigate();
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -42,9 +43,7 @@ function BlogCard({ post, variant = "card", showImage = true }) {
     }
 
     const handleEdit = () => {
-        // Navigate to edit page
-        // e.g., navigate(`/blog/edit/${post.slug}`)
-        console.log("Edit clicked");
+        navigate(`/blog/edit/${post.slug}`);
     };
 
     const handleDelete = async () => {

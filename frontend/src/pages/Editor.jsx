@@ -12,24 +12,32 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tiptap } from '@/components/common/Tiptap';
-import { useCreateBlogMutation } from '@/redux/api/blogApiSlice';
+import { useCreateBlogMutation, useGetBlogBySlugQuery, useUpdateBlogMutation } from '@/redux/api/blogApiSlice';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const Editor = () => {
+const Editor = ({ isEditing }) => {
+    const { slug } = useParams();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [tags, setTags] = useState([]);
     const [currentTag, setCurrentTag] = useState('');
     const [category, setCategory] = useState('');
     const [status, setStatus] = useState("Draft");
+
+
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [mode, setMode] = useState('write');
     const [wordCount, setWordCount] = useState(0);
     const [lastSaved, setLastSaved] = useState(null);
     const [featuredImage, setFeaturedImage] = useState(null)
     const [createblog, { isLoading }] = useCreateBlogMutation()
+
+
     const navigate = useNavigate();
+    const { data: blog, isLoading: isFetching } = useGetBlogBySlugQuery(slug, { skip: !isEditing });
+    const [updateBlog, { isLoading: isUpdating }] = useUpdateBlogMutation();
+    const blogData = blog?.data?.oneBlog?.[0];
 
     const categories = [
         "Technology", "Programming", "Business", "Finance", "Health", "Fitness",
@@ -38,12 +46,32 @@ const Editor = () => {
         "Productivity"
     ];
 
+    console.log(blog);
+
 
     useEffect(() => {
+        const fetchedBlog = blog?.data?.oneBlog?.[0];
+        if (fetchedBlog) {
+            setTitle(fetchedBlog.title || '');
+            setContent(fetchedBlog.content || '');
+            setTags(fetchedBlog.tags || []);
+            setCategory(fetchedBlog.category || '');
+            setStatus(fetchedBlog.status || 'Draft');
+            setFeaturedImage(null); // only if user uploads new one
+        }
+    }, [blog]);
+
+
+    useEffect(() => {
+        if (!content) {
+            setWordCount(0);
+            return;
+        }
         const textContent = content.replace(/<[^>]*>/g, ' ').trim();
         const words = textContent.split(/\s+/).filter(word => word.length > 0);
         setWordCount(words.length);
     }, [content]);
+
 
     useEffect(() => {
         if (content || title) {
@@ -99,23 +127,24 @@ const Editor = () => {
         if (featuredImage) {
             formData.append("featuredImage", featuredImage);
         }
-        // files.forEach(file => formData.append("files", file));
-
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
+        console.log([blogData._id, formData]);
 
         try {
-            const res = await createblog(formData).unwrap();
-            toast.success(res.message);
-            console.log(res);
-            navigate(`/blog/${res.data.blog.slug}`)
+            if (isEditing && blogData?._id) {
+                const res = await updateBlog({ id: blogData._id, formData }).unwrap();
+                toast.success(res.message || "Blog updated");
+                navigate(`/blog/${res.data.blog.slug}`);
+            } else {
+                const res = await createblog(formData).unwrap();
+                toast.success(res.message || "Blog created");
+                navigate(`/blog/${res.data.blog.slug}`);
+            }
         } catch (error) {
-            console.error("❌ Blog creation failed:", error);
             toast.error(error?.data?.message || "Something went wrong");
         }
     };
 
+    if (isFetching) return <p className="text-white">Loading blog...</p>;
 
     if (isFullscreen) {
         return (

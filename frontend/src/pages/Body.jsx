@@ -41,6 +41,7 @@ function Body() {
                         <Route path='change-password' element={<ChangePassword />} />
                         <Route path="email-change" element={<EmailChange />} />
                         <Route path="email-change-confirmation" element={<EmailChangeConfirmation />} />
+                        <Route path="/blog/edit/:slug" element={<Editor isEditing={true} />} />
                     </Route>
                 </Route>
             </>

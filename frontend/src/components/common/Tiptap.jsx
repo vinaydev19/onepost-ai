@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import './tiptap.css'
 import StarterKit from '@tiptap/starter-kit'
@@ -88,7 +88,7 @@ export const Tiptap = ({ content, onChange, placeholder }) => {
                 },
             }),
         ],
-        content,
+        content: content || "",
         onUpdate: ({ editor }) => {
             onChange(editor.getHTML())
         },
@@ -98,6 +98,12 @@ export const Tiptap = ({ content, onChange, placeholder }) => {
             },
         },
     })
+
+    useEffect(() => {
+        if (editor && content !== editor.getHTML()) {
+            editor.commands.setContent(content, false); // false = don’t add to history
+        }
+    }, [content, editor]);
 
     const addLink = useCallback(() => {
         if (linkUrl && editor) {
