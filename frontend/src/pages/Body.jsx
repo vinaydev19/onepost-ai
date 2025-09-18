@@ -12,7 +12,6 @@ import ReadingLists from './ReadingLists'
 import ForgotPassword from './ForgotPassword'
 import VerifyOTP from './VerifyOTP'
 import PasswordReset from './PasswordReset'
-import PasswordChange from './PasswordChange'
 import EmailChange from './EmailChange'
 import Editor from './Editor'
 import BlogPost from './BlogPost'
@@ -28,7 +27,6 @@ function Body() {
                 <Route path="forgot-password" element={<ForgotPassword />} />
                 <Route path="verify-otp" element={<VerifyOTP />} />
                 <Route path="password-reset" element={<PasswordReset />} />
-                <Route path="password-change" element={<PasswordChange />} />
 
                 <Route path='' element={<ProtectedRoute />}>
                     <Route element={<MainLayout />}>

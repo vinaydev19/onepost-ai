@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardDescription, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useLoginMutation } from '@/redux/api/userApiSlice'
 import { LoaderTwo } from '@/components/ui/loader'
 import toast from 'react-hot-toast'
@@ -101,12 +101,12 @@ function Login() {
                             </div>
 
                             <div className="flex items-center justify-between">
-                                <div
+                                <Link
                                     to="/forgot-password"
                                     className="text-sm text-primary hover:underline transition-colors"
                                 >
                                     Forgot password?
-                                </div>
+                                </Link>
                             </div>
 
                             <Button
