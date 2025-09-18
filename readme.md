@@ -48,7 +48,7 @@ Create, publish, and enhance blogs with a distraction-free writing experience, s
 | Database | MongoDB |
 | Authentication | JWT + bcrypt |
 | Media Storage | Cloudinary |
-| Styling / UI | (your choice, e.g. TailwindCSS, Material-UI) |
+| Styling / UI | TailwindCSS, Shadcn Ui |
 
 ---
 
