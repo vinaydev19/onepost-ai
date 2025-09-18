@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
-import './tiptap.css'
+import './Tiptap.css'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
